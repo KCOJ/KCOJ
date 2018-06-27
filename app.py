@@ -4,6 +4,10 @@ from KCOJ_api.kcoj import KCOJ
 
 from flask import Flask, request, url_for, redirect
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+import sys
+import json
+import time
+import threading
 
 URL = "https://140.124.184.228/Exam/"
 
@@ -37,7 +41,7 @@ def keep_login():
     if user['api'].check_online():
         return True
     # 如果不是登入狀態就嘗試登入
-    user['api'].login(current_user.get_id(), user['passwd'], user['course'])
+    user['api'].login(user['userid'], user['passwd'], user['course'])
     # 回傳登入狀態
     return user['api'].check_online()
 
@@ -88,6 +92,7 @@ def login_page():
                 users[userid]['api'] = api
             else:
                 users[userid] = {
+                    'userid': userid,
                     'passwd': passwd,
                     'course': course,
                     'email': '',
@@ -196,8 +201,52 @@ def logout_nopage():
     logout_user()
     return redirect('/login')
 
+# 將 JSON 檔還原使用者資料
+def restore_db():
+    try:
+        with open(sys.path[0] + '/users.json', 'r') as f:
+            users_restore = json.load(f)
+            for key in users_restore.keys():
+                user = users_restore[key]
+                users[key] = {
+                    'userid': user['userid'],
+                    'passwd': user['passwd'],
+                    'course': user['course'],
+                    'email': user['email'],
+                    'api': KCOJ(URL),
+                }
+    except FileNotFoundError:
+        with open(sys.path[0] + '/users.json', 'w') as f:
+            f.write("{}")
+
+# 備份使用者資料到 JSON 檔
+def backup_db():
+    users_backup = {}
+    for key in users.keys():
+        user = users[key]
+        users_backup[key] = {
+            'userid': user['userid'],
+            'passwd': user['passwd'],
+            'course': user['course'],
+            'email': user['email'],
+        }
+    with open(sys.path[0] + '/users.json', 'w') as f:
+        json.dump(users_backup, f, indent='  ')
+	
+class BackupThread(threading.Thread):
+    def run(self):
+        while True:
+            # 備份資料
+            backup_db()
+            # 延遲 10 秒
+            time.sleep(10)
 
 def main():
+    # 還原資料
+    restore_db()
+    # 背景自動備份資料
+    BackupThread().start()
+    # 開啟伺服器
     app.run(port=11711, threaded=True)
 
 if __name__ == '__main__':
