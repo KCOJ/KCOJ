@@ -25,6 +25,11 @@
                     {% endfor %}
                 </select>
             </div>
+            {% if error_message %}
+            <div class="input-group mb-3 alert alert-danger">
+                {{ error_message }}
+            </div>
+            {% endif %}
             <div class="input-group d-flex justify-content-center">
                 <button type="submit" class="btn bg-theme">登入</button>
             </div>
