@@ -2,11 +2,12 @@
 
 from KCOJ_api.kcoj import KCOJ
 
-from flask import Flask, request, url_for, redirect
+from flask import Flask, request, url_for, redirect, Response
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import sys
 import json
 import time
+import hashlib
 import threading
 
 URL = "https://140.124.184.228/Exam/"
@@ -114,8 +115,13 @@ def user_page():
     if request.method == 'GET':
         # TODO: 顯示 Gravatar 大頭貼和變更密碼的欄位，
         # 不過在顯示別人的資料（?id=）時不會出現變更密碼的欄位。
-        
-        return "GET /user"
+        email = users[current_user.get_id()]['email']
+        gravatar_url = 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(email, 'utf-8')).hexdigest()
+        temp = """
+            <img src="{0}" alt="gravatar">
+            <pre>{1}</pre>
+        """.format(gravatar_url, email)
+        return Response(temp, content_type='text/html; charset=utf-8')
     if request.method == 'POST':
         # TODO: 判斷舊密碼是否正確，正確的話更新資料。
         return "POST /user"
