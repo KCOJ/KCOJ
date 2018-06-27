@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
 from flask import Flask, request, Response
+from flask_login import LoginManager
 
 # 初始化 Flask
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'KuoKuoKuo'
+# 初始化 Flask 登入管理員
+login_manager = LoginManager(app)
 
 # 主畫面
 @app.route('/', methods=['GET'], strict_slashes=False)
