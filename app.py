@@ -137,7 +137,25 @@ def user_page():
         return Response(temp, content_type='text/html; charset=utf-8')
     if request.method == 'POST':
         # TODO: 判斷舊密碼是否正確，正確的話更新資料。
-        return "POST /user"
+        # 取得更新資訊
+        userid = current_user.get_id()
+        old_passwd = request.form['old_passwd']
+        new_passwd = request.form['new_passwd']
+        email = request.form['email']
+        # 登入交作業網站
+        api = KCOJ(URL)
+        api.login(userid, old_passwd, users[userid]['course'])
+        # 確認是否登入成功
+        if api.check_online():
+            # 如果要變更密碼
+            if new_passwd != '':
+                api.change_password(new_passwd)
+                users[userid]['passwd'] = new_passwd
+            # 如果要變更 Email
+            if email != '':
+                users[userid]['email'] = email
+                
+        return redirect('/user')
 
 # 技巧文庫畫面
 @app.route('/docs', methods=['GET'], strict_slashes=False)
