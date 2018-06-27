@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="css/global.css">
+    <link rel="stylesheet" type="text/css" href="css/personal.css">
+    <title>KCOJ - 第30題 : 方程式運算問題</title>
+</head>
+<body>
+    <!-- 導覽列 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top top-navbar">
+        <a class="navbar-brand" href="#">KCOJ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">題庫</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">程式技巧</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">個人頁面</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">登出</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要版面 -->
+    <main class='container mt-3'>
+        <h1 class="text-center text-shadow">個人頁面</h1>
+        <div class="personal-card">
+            <div class="flex-center">
+                <img class="personal-image" src="images/Example.png" alt="Personal Image">
+            </div>
+            <div class="personal-info">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">學號</span>
+                    </div>
+                    <input type="text" class="form-control" value="105590044" disabled>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">信箱</span>
+                    </div>
+                    <input type="text" class="form-control" value="abc123@gmail.com" disabled>
+                </div>
+                <hr>
+                <!-- 變更密碼 -->
+                <h5 class="text-center text-shadow">變更密碼</h5>
+                <form action="">
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" name="old_passwd" placeholder="目前密碼" aria-label="old_passwd">
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" name="new_passwd" placeholder="新密碼" aria-label="new_passwd">
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" name="confirm_new_passwd" placeholder="確認新密碼" aria-label="confirm_new_passwd">
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">送出</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
