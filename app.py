@@ -2,7 +2,7 @@
 
 from KCOJ_api.kcoj import KCOJ
 
-from flask import Flask, request, url_for, redirect, Response
+from flask import Flask, request, url_for, redirect, Response, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import sys
 import json
@@ -13,7 +13,7 @@ import threading
 URL = "https://140.124.184.228/Exam/"
 
 # 初始化 Flask
-app = Flask(__name__, instance_relative_config=True)
+app = Flask(__name__, instance_relative_config=True, template_folder='template')
 app.config.from_object('config')
 app.config.from_pyfile('config.py')
 
@@ -69,24 +69,13 @@ def login_failed_page():
 # 登入畫面
 @app.route('/login', methods=['GET', 'POST'], strict_slashes=False)
 def login_page():
+    # 使用 API
+    api = KCOJ(URL)
+
     if request.method == 'GET':
-        # TODO: 放上真正的登入畫面。
-        temp = """
-            <form action='/login' method='POST'>
-                userid: <input name='userid' type='text' required/>
-                <br>
-                passwd: <input name='passwd' type='password' required/>
-                <br>
-                course: <input name='course' type='text' required/>
-                <br>
-                <input value='Login' type='submit'/>
-            </form>
-        """
-        return Response(temp, content_type='text/html; charset=utf-8')
+        return render_template('login.html', title="KCOJ - 登入", courses=api.get_courses())
 
     if request.method == 'POST':
-        # 使用 API
-        api = KCOJ(URL)
         # 取得登入資訊
         userid = request.form['userid']
         passwd = request.form['passwd']
