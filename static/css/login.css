@@ -1,0 +1,101 @@
+body {
+    background-image: url("../images/LoginBackground.jpg");
+    background-size: cover;
+}
+
+.color-deep-gray { color: #555555; }
+.color-theme { color: #19cf86; }
+.color-subtheme { color: #e8faf2; }
+
+.bg-theme { background-color: #19cf86; }
+.bg-subtheme { background-color: #e8faf2; }
+
+.mt-note { margin-top: 22.5%; }
+
+h1 { 
+    font-size: 2.15rem; 
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.15rem;
+    text-align: center;
+}
+
+section {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid black;
+    margin-left: 0;
+    box-shadow: -3px 0 5px #333;
+}
+
+div.caption-pad {
+    height: 30%;
+    padding-top: 5rem;
+}
+
+div.login-pad {
+    height: 70%;
+    background-color: #e8faf2;
+    color: #19cf86;
+    padding: 7% 10%;
+    border-top: 1px solid black;
+}
+
+/* For minor height screen */
+@media screen and (max-height: 600px) {
+    h1 { 
+        font-size: 1.85rem; 
+    }
+    h2 {
+        font-size: 1rem;
+    }
+    div.caption-pad { padding-top: 3rem; }
+    .mt-note { margin-top: 10%; }
+}
+
+/* For tablet */
+@media screen and (min-width: 768px) {
+    h1 { 
+        font-size: 2.5rem; 
+    }
+    h2 {
+        font-size: 1.25rem;
+    }
+    section {
+        width: 100%;
+        margin-left: 0;
+    } 
+    div.caption-pad {
+        height: 30%;
+    }
+    div.login-pad {
+        padding: 7% 25%;
+    }
+}
+
+/* For computer or laptop */
+@media screen and (min-width: 1280px) {
+    h1 { 
+        font-size: 2.5rem; 
+        text-align: left;
+    }
+    h2 {
+        font-size: 1.25rem;
+        text-align: left;
+    }
+    section {
+        width: 40%;
+        margin-left: auto;
+    }
+    div.caption-pad {
+        height: 30%;
+        padding-left: 3.5rem;
+    }
+    div.login-pad {
+        padding: 7% 10%;
+    }
+}
