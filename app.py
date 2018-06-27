@@ -8,8 +8,10 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 URL = "https://140.124.184.228/Exam/"
 
 # 初始化 Flask
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'KuoKuoKuo'
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('config')
+app.config.from_pyfile('config.py')
+
 # 初始化 Flask 登入管理員
 login_manager = LoginManager(app)
 
@@ -152,7 +154,7 @@ def logout_nopage():
 
 
 def main():
-    app.run(port=11711, threaded=True, debug=True)
+    app.run(port=11711, threaded=True)
 
 if __name__ == '__main__':
     main()
