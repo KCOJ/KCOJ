@@ -50,7 +50,7 @@ def root_page():
         logout_user()
 
     # TODO: 顯示主畫面
-    return "GET /"
+    return str(users[current_user.get_id()]['api'].get_notices())
 
 # 登入失敗回到登入畫面
 @login_manager.unauthorized_handler
@@ -146,7 +146,7 @@ def question_page():
         logout_user()
 
     # TODO: 顯示題目列表。
-    return "GET /question"
+    return str(users[current_user.get_id()]['api'].list_questions())
 
 # 作業題目畫面
 @app.route('/question/<number>', methods=['GET', 'POST'], strict_slashes=False)
@@ -158,7 +158,7 @@ def question_number_page(number):
 
     if request.method == 'GET':
         # TODO: 顯示題目內容。
-        return "GET /question/" + number
+        return users[current_user.get_id()]['api'].show_question(number)
     if request.method == 'POST':
         # TODO: 提交程式碼內容到作業網站。
         return "POST /question/" + number
@@ -187,7 +187,7 @@ def question_number_passed_page(number):
         logout_user()
     
     # TODO: 顯示通過名單。
-    return "GET /question/" + number + "passed"
+    return str(users[current_user.get_id()]['api'].list_passers(number))
 
 # 登出沒有畫面
 @app.route('/logout', methods=['GET'], strict_slashes=False)
