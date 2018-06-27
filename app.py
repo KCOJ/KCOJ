@@ -20,6 +20,10 @@ app.config.from_pyfile('config.py')
 # 初始化 Flask 登入管理員
 login_manager = LoginManager(app)
 
+# 寫死的題目標題、敘述、標籤
+with open('questions.json', 'r') as f:
+    ext_questions = json.load(f)
+
 # 儲存使用者資訊
 users = {}  
 
@@ -188,7 +192,31 @@ def question_page():
         logout_user()
 
     # TODO: 顯示題目列表。
-    return str(users[current_user.get_id()]['api'].list_questions())
+    questions = {}
+    int_questions = users[current_user.get_id()]['api'].list_questions()
+    for number in int_questions:
+        if number in ext_questions:
+            questions[number] = {
+                'title': ext_questions[number]['title'],
+                'description': ext_questions[number]['description'],
+                'tag': ext_questions[number]['tag'],
+                'deadline': int_questions[number][0],
+                'submit': int_questions[number][1],
+                'status': int_questions[number][2],
+                'language': int_questions[number][3],
+            }
+        else:
+            questions[number] = {
+                'title': '',
+                'description': '',
+                'tag': '',
+                'deadline': int_questions[number][0],
+                'submit': int_questions[number][1],
+                'status': int_questions[number][2],
+                'language': int_questions[number][3],
+            }
+
+    return str(questions)
 
 # 作業題目畫面
 @app.route('/question/<number>', methods=['GET', 'POST'], strict_slashes=False)
