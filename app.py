@@ -73,6 +73,7 @@ def login_page():
     api = KCOJ(URL)
 
     if request.method == 'GET':
+        # 顯示登入畫面
         return render_template('login.html', title="KCOJ - 登入", courses=api.get_courses())
 
     if request.method == 'POST':
@@ -102,8 +103,8 @@ def login_page():
                 }
             return redirect('/')
         else:
-            # TODO: 登入失敗顯示登入畫面並加上失敗提示字串。
-            return redirect('/login')
+            # 顯示登入畫面含錯誤訊息
+            return render_template('login.html', title="KCOJ - 登入", courses=api.get_courses(), error_message="登入失敗，請檢查輸入的資訊是否有誤！")
 
 # 個人資料畫面
 @app.route('/user', methods=['GET', 'POST'], strict_slashes=False)
