@@ -30,10 +30,25 @@ def user_loader(userid):
     else:
         return None
 
+# 試著保持著登入狀態
+def keep_login():
+    user = users[current_user.get_id()]
+    # 確認是否是登入狀態
+    if user['api'].check_online():
+        return True
+    # 如果不是登入狀態就嘗試登入
+    user['api'].login(current_user.get_id(), user['passwd'], user['course'])
+    # 回傳登入狀態
+    return user['api'].check_online()
+
 # 主畫面
 @app.route('/', methods=['GET'], strict_slashes=False)
 @login_required
 def root_page():
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+
     # TODO: 顯示主畫面
     return "GET /"
 
@@ -87,9 +102,14 @@ def login_page():
 @app.route('/user', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def user_page():
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+
     if request.method == 'GET':
         # TODO: 顯示 Gravatar 大頭貼和變更密碼的欄位，
         # 不過在顯示別人的資料（?id=）時不會出現變更密碼的欄位。
+        
         return "GET /user"
     if request.method == 'POST':
         # TODO: 判斷舊密碼是否正確，正確的話更新資料。
@@ -99,6 +119,10 @@ def user_page():
 @app.route('/docs', methods=['GET'], strict_slashes=False)
 @login_required
 def docs_page():
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+
     # TODO: 顯示文件列表。
     return "GET /docs"
 
@@ -106,6 +130,10 @@ def docs_page():
 @app.route('/docs/<name>', methods=['GET'], strict_slashes=False)
 @login_required
 def docs_name_page(name):
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+
     # TODO: 顯示該篇文件。
     return "GET /docs/" + name
 
@@ -113,6 +141,10 @@ def docs_name_page(name):
 @app.route('/question', methods=['GET'], strict_slashes=False)
 @login_required
 def question_page():
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+
     # TODO: 顯示題目列表。
     return "GET /question"
 
@@ -120,6 +152,10 @@ def question_page():
 @app.route('/question/<number>', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def question_number_page(number):
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+
     if request.method == 'GET':
         # TODO: 顯示題目內容。
         return "GET /question/" + number
@@ -131,6 +167,10 @@ def question_number_page(number):
 @app.route('/question/<number>/chat', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def question_number_chat_page(number):
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+
     if request.method == 'GET':
         # TODO: 顯示討論內容。
         return "GET /question/" + number + "chat"
@@ -142,6 +182,10 @@ def question_number_chat_page(number):
 @app.route('/question/<number>/passed', methods=['GET'], strict_slashes=False)
 @login_required
 def question_number_passed_page(number):
+    # 嘗試保持登入狀態
+    if not keep_login():
+        logout_user()
+    
     # TODO: 顯示通過名單。
     return "GET /question/" + number + "passed"
 
