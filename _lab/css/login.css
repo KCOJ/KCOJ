@@ -29,6 +29,7 @@ section {
     background-color: rgba(255, 255, 255, 0.7);
     border: 1px solid black;
     margin-left: 0;
+    box-shadow: -3px 0 5px #333;
 }
 
 div.caption-pad {
