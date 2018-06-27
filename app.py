@@ -67,14 +67,18 @@ def login_failed_page():
 def login_page():
     if request.method == 'GET':
         # TODO: 放上真正的登入畫面。
-        return """
-            <form action='login' method='POST'>
-                <input name='userid' type='text'/>
-                <input name='passwd' type='password'/>
-                <input name='course' type='text'/>
+        temp = """
+            <form action='/login' method='POST'>
+                userid: <input name='userid' type='text' required/>
+                <br>
+                passwd: <input name='passwd' type='password' required/>
+                <br>
+                course: <input name='course' type='text' required/>
+                <br>
                 <input value='Login' type='submit'/>
             </form>
         """
+        return Response(temp, content_type='text/html; charset=utf-8')
 
     if request.method == 'POST':
         # 取得登入資訊
@@ -120,6 +124,15 @@ def user_page():
         temp = """
             <img src="{0}" alt="gravatar">
             <pre>{1}</pre>
+            <form action='/user' method='POST'>
+                old_passwd: <input name='old_passwd' type='password' required/>
+                <br>
+                new_passwd: <input name='new_passwd' type='password'/>
+                <br>
+                email: <input name='email' type='email'/>
+                <br>
+                <input value='Submit' type='submit'/>
+            </form>
         """.format(gravatar_url, email)
         return Response(temp, content_type='text/html; charset=utf-8')
     if request.method == 'POST':
