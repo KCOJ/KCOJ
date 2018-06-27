@@ -120,7 +120,7 @@ def user_page():
         # TODO: 顯示 Gravatar 大頭貼和變更密碼的欄位，
         # 不過在顯示別人的資料（?id=）時不會出現變更密碼的欄位。
         email = users[current_user.get_id()]['email']
-        gravatar_url = 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(email, 'utf-8')).hexdigest()
+        gravatar_url = 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(email, 'utf-8')).hexdigest() + '?size=200'
         temp = """
             <img src="{0}" alt="gravatar">
             <pre>{1}</pre>
