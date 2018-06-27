@@ -85,12 +85,16 @@ def login_page():
         return Response(temp, content_type='text/html; charset=utf-8')
 
     if request.method == 'POST':
+        # 使用 API
+        api = KCOJ(URL)
         # 取得登入資訊
         userid = request.form['userid']
         passwd = request.form['passwd']
-        course = request.form['course']
+        try:
+            course = api.get_courses().index(request.form['course']) + 1
+        except ValueError:
+            course = 0
         # 登入交作業網站
-        api = KCOJ(URL)
         api.login(userid, passwd, course)
         # 確認是否登入成功
         if api.check_online():
