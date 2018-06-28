@@ -168,8 +168,9 @@ def docs_page():
     if not keep_login():
         logout_user()
 
-    # TODO: 顯示文件列表。
-    return "GET /docs"
+    userid = current_user.get_id()
+
+    return render_template('docs.html', title="KCOJ - 程式技巧", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30))
 
 # 技巧文件畫面
 @app.route('/docs/<name>', methods=['GET'], strict_slashes=False)
