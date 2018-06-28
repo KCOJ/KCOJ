@@ -50,6 +50,10 @@ def keep_login():
     # 回傳登入狀態
     return user['api'].check_online()
 
+# 取得 Gravatar 上的大頭貼
+def get_gravatar(size):
+    return 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(users[current_user.get_id()]['email'], 'utf-8')).hexdigest() + '?size=' + str(size)
+
 # 主畫面
 @app.route('/', methods=['GET'], strict_slashes=False)
 @login_required
@@ -59,7 +63,7 @@ def root_page():
         logout_user()
 
     # TODO: 顯示主畫面
-    return render_template('home.html', title="KCOJ - 首頁")
+    return render_template('home.html', title="KCOJ - 首頁", account=current_user.get_id(), gravatar=get_gravatar(30))
     return #str(users[current_user.get_id()]['api'].get_notices())
 
 # 登入失敗回到登入畫面
