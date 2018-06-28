@@ -261,6 +261,7 @@ def question_page():
     return render_template('question.html', title="KCOJ - 題庫", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), course=KCOJ(URL).get_courses()[int(users[userid]['course']) - 1], open_questions=open_questions, close_questions=close_questions)
 
 # 作業題目畫面
+@app.route('/question/<number>/content', methods=['GET', 'POST'], strict_slashes=False)
 @app.route('/question/<number>', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def question_number_page(number):
