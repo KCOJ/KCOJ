@@ -73,12 +73,16 @@ ul.page-tab {
     width: 100%;
     margin-top: 16px;
     margin-bottom: 16px;
-    border-bottom: 4px solid #888;
+    border-bottom-width: 2px;
+    border-color: #AAA;
+    box-shadow: 0 3px 3px #AAA;
 }
 
 /* 分頁按鈕(Tab) */
-ul.page-tab > li.nav-item > a { border: 0;  }
-ul.page-tab > li.nav-item > a.active { border-bottom: 3px solid rgb(0, 110, 255); }
+ul.page-tab > li.nav-item > a { border-width: 2px 2px 0 2px; }
+ul.page-tab > li.nav-item > a:hover,
+ul.page-tab > li.nav-item > a:focus,
+ul.page-tab > li.nav-item > a.active { border-color: #AAA; border-bottom-width: 0px; }
 
 /* 發送答案 與 觀看測資的列表 */
 div.action-bar {
