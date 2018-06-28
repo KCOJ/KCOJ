@@ -21,7 +21,13 @@
 
             {% for number in open_questions %} 
             <div class='question-item' tabindex='0'>
-                <div class="state passed">{{  number  }}</div>
+                <div class="state {% if open_questions[number]['result'] == 2 %}
+                not-answered
+                {% elif open_questions[number]['result'] == 1 %}
+                passed
+                {% elif open_questions[number]['result'] == 0 %}
+                not-passed
+                {% endif %}">{{  number  }}</div>
                 <div class='question-info'>
                     <h4 class='question-title'><a href="/question/{{  number  }}">{{  open_questions[number]['title']  }}</a></h4>
                     <p class='question-description'>{{  open_questions[number]['description']  }}</p>
@@ -45,7 +51,13 @@
 
             {% for number in close_questions %}
             <div class='question-item' tabindex='0'>
-                <div class="state passed">{{  number  }}</div>
+                <div class="state {% if close_questions[number]['result'] == 2 %}
+                not-answered
+                {% elif close_questions[number]['result'] == 1 %}
+                passed
+                {% elif close_questions[number]['result'] == 0 %}
+                not-passed
+                {% endif %}">{{  number  }}</div>
                 <div class='question-info'>
                     <h4 class='question-title'><a href="/question/{{  number  }}">{{  close_questions[number]['title']  }}</a></h4>
                     <p class='question-description'>{{  close_questions[number]['description']  }}</p>

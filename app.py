@@ -191,8 +191,11 @@ def question_page():
         logout_user()
 
     # TODO: 顯示題目列表。
+    userid = current_user.get_id()
+
     questions = {}
-    int_questions = users[current_user.get_id()]['api'].list_questions()
+    int_questions = users[userid]['api'].list_questions()
+
     for number in int_questions:
         if number in ext_questions:
             questions[number] = {
@@ -203,6 +206,7 @@ def question_page():
                 'submit': int_questions[number][1],
                 'status': int_questions[number][2],
                 'language': int_questions[number][3],
+                'results': users[userid]['api'].list_results(number, userid),
             }
         else:
             questions[number] = {
@@ -213,6 +217,7 @@ def question_page():
                 'submit': int_questions[number][1],
                 'status': int_questions[number][2],
                 'language': int_questions[number][3],
+                'results': users[userid]['api'].list_results(number, userid),
             }
 
     close_questions = {}
@@ -221,13 +226,39 @@ def question_page():
     for number in questions:
         if questions[number]['submit'] == '期限已到':
             close_questions[number] = questions[number]
+            if len(close_questions[number]['results']) == 0:
+                close_questions[number]['results'] = 2
+            else:
+                results = []
+                raw = close_questions[number]['results']
+                for result in raw:
+                    results += [result[1]]
+
+                results = list(map(lambda x: x == "通過測試", results))
+
+                if False in results:
+                    close_questions[number]['result'] = 0
+                else:
+                    close_questions[number]['result'] = 1
         else:
             open_questions[number] = questions[number]
+            if len(open_questions[number]['results']) == 0:
+                open_questions[number]['results'] = 2
+            else:
+                results = []
+                raw = open_questions[number]['results']
+                for result in raw:
+                    results += [result[1]]
 
-    userid = current_user.get_id()
+                results = list(map(lambda x: x == "通過測試", results))
 
+                if False in results:
+                    open_questions[number]['result'] = 0
+                else:
+                    open_questions[number]['result'] = 1
+
+    # return str(close_questions)
     return render_template('question.html', title="KCOJ - 題庫", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), course=KCOJ(URL).get_courses()[int(users[userid]['course']) - 1], open_questions=open_questions, close_questions=close_questions)
-    return str(questions)
 
 # 作業題目畫面
 @app.route('/question/<number>', methods=['GET', 'POST'], strict_slashes=False)

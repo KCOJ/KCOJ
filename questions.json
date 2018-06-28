@@ -245,25 +245,25 @@
 		"description": "以雙向鏈結實作堆疊、佇列、自定義dLink",
 		"tag": ["doubleLinkedList","stack","queue"]
 	},
-	"042": 
+	"101": 
 	{
 		"title": "猜數字",
 		"description": "設定一組答案，以相似度(?A猜對位置、?B猜中數值但位置不對)的方式引道玩家猜出答案",
 		"tag": ["simulation"]
 	},
-	"043": 
+	"102": 
 	{
 		"title": "IP網段辨識",
 		"description": "將輸入的IP資料整理相同的網段與錯誤的IP並輸出",
 		"tag": ["string"]
 	},
-	"044": 
+	"103": 
 	{
 		"title": "大學篩選工具",
 		"description": "輸入大學名稱、特色與使用者的需求，篩選出符合的學校",
 		"tag": ["string"]
 	},
-	"045": 
+	"104": 
 	{
 		"title": "檔案輸出入",
 		"description": "實作一個可以對txt檔讀寫的程式",
