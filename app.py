@@ -332,16 +332,73 @@ def question_number_page(number):
         return "POST /question/" + number
 
 # 作業討論畫面
-@app.route('/question/<number>/chat', methods=['GET', 'POST'], strict_slashes=False)
+@app.route('/question/<number>/forum', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
-def question_number_chat_page(number):
+def question_number_forum_page(number):
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
 
     if request.method == 'GET':
-        # TODO: 顯示討論內容。
-        return "GET /question/" + number + "chat"
+        userid = current_user.get_id()
+
+        content = users[userid]['api'].show_question(number)
+
+        question_number = number
+
+        questions = {}
+        int_questions = users[userid]['api'].list_questions()
+
+        for number in int_questions:
+            if number in ext_questions:
+                questions[number] = {
+                    'title': ext_questions[number]['title'],
+                    'description': ext_questions[number]['description'],
+                    'tag': ext_questions[number]['tag'],
+                    'deadline': int_questions[number][0],
+                    'submit': int_questions[number][1],
+                    'status': int_questions[number][2],
+                    'language': int_questions[number][3],
+                    'results': users[userid]['api'].list_results(number, userid),
+                }
+            else:
+                questions[number] = {
+                    'title': '未命名',
+                    'description': '沒有敘述',
+                    'tag': '',
+                    'deadline': int_questions[number][0],
+                    'submit': int_questions[number][1],
+                    'status': int_questions[number][2],
+                    'language': int_questions[number][3],
+                    'results': users[userid]['api'].list_results(number, userid),
+                }
+
+        for number in questions:
+            if len(questions[number]['results']) == 0:
+                questions[number]['result'] = 2
+            else:
+                results = []
+                raw = questions[number]['results']
+                for result in raw:
+                   results += [result[1]]
+
+                results = list(map(lambda x: x == '通過測試', results))
+
+                if False in results:
+                    questions[number]['result'] = 0
+                else:
+                    questions[number]['result'] = 1
+
+        question = questions[question_number]
+
+        results = []
+        raw = question['results']
+        for result in raw:
+           results += [result]
+
+        display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
+
+        return render_template('question_number_forum.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results)
     if request.method == 'POST':
         # TODO: 新增討論文章。
         return "POST /question/" + number + "chat"
