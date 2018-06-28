@@ -137,7 +137,7 @@ def user_page():
             else:
                 view_email = ''
 
-        return render_template('user.html', title=("KCOJ - " + view_userid), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), view_userid=view_userid, view_email=view_email, view_gravatar=get_gravatar(view_email, 200))
+        return render_template('user.html', title=("KCOJ - " + view_userid), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), view_userid=view_userid, view_email=view_email, view_gravatar=get_gravatar(view_email, 200), no_me=(userid != view_userid))
 
     if request.method == 'POST':
         # TODO: 判斷舊密碼是否正確，正確的話更新資料。

@@ -29,16 +29,16 @@
             <h5 class="text-center text-shadow">修改資訊</h5>
             <form action="/user" method="POST">
                 <div class="input-group mb-3">
-                    <input type="password" class="form-control" name="old_passwd" placeholder="舊密碼" aria-label="old_passwd" required>
+                    <input type="password" class="form-control" name="old_passwd" placeholder="舊密碼" aria-label="old_passwd" required {% if no_me %}disabled{% endif %}>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="password" class="form-control" name="new_passwd" placeholder="新密碼（可留白）" aria-label="new_passwd">
+                    <input type="password" class="form-control" name="new_passwd" placeholder="新密碼（可留白）" aria-label="new_passwd" {% if no_me %}disabled{% endif %}>
                 </div>
                 <div class="input-group mb-3">
-                    <input type="email" class="form-control" name="email" placeholder="信箱地址（可留白）" aria-label="email">
+                    <input type="email" class="form-control" name="email" placeholder="信箱地址（可留白）" aria-label="email" {% if no_me %}disabled{% endif %}>
                 </div>
                 <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">送出</button>
+                    <button type="submit" class="btn btn-primary" {% if no_me %}disabled{% endif %}>送出</button>
                 </div>
             </form>
         </div>
