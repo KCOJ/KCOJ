@@ -59,7 +59,8 @@ def root_page():
         logout_user()
 
     # TODO: 顯示主畫面
-    return str(users[current_user.get_id()]['api'].get_notices())
+    return render_template('home.html', title="KCOJ - 首頁")
+    return #str(users[current_user.get_id()]['api'].get_notices())
 
 # 登入失敗回到登入畫面
 @login_manager.unauthorized_handler
