@@ -227,14 +227,14 @@ def question_page():
         if questions[number]['submit'] == '期限已到':
             close_questions[number] = questions[number]
             if len(close_questions[number]['results']) == 0:
-                close_questions[number]['results'] = 2
+                close_questions[number]['result'] = 2
             else:
                 results = []
                 raw = close_questions[number]['results']
                 for result in raw:
                     results += [result[1]]
 
-                results = list(map(lambda x: x == "通過測試", results))
+                results = list(map(lambda x: x == '通過測試', results))
 
                 if False in results:
                     close_questions[number]['result'] = 0
@@ -243,14 +243,14 @@ def question_page():
         else:
             open_questions[number] = questions[number]
             if len(open_questions[number]['results']) == 0:
-                open_questions[number]['results'] = 2
+                open_questions[number]['result'] = 2
             else:
                 results = []
                 raw = open_questions[number]['results']
                 for result in raw:
                     results += [result[1]]
 
-                results = list(map(lambda x: x == "通過測試", results))
+                results = list(map(lambda x: x == '通過測試', results))
 
                 if False in results:
                     open_questions[number]['result'] = 0
@@ -269,7 +269,65 @@ def question_number_page(number):
 
     if request.method == 'GET':
         # TODO: 顯示題目內容。
-        return users[current_user.get_id()]['api'].show_question(number)
+        userid = current_user.get_id()
+
+        content = users[userid]['api'].show_question(number)
+
+        question_number = number
+
+        questions = {}
+        int_questions = users[userid]['api'].list_questions()
+
+        for number in int_questions:
+            if number in ext_questions:
+                questions[number] = {
+                    'title': ext_questions[number]['title'],
+                    'description': ext_questions[number]['description'],
+                    'tag': ext_questions[number]['tag'],
+                    'deadline': int_questions[number][0],
+                    'submit': int_questions[number][1],
+                    'status': int_questions[number][2],
+                    'language': int_questions[number][3],
+                    'results': users[userid]['api'].list_results(number, userid),
+                }
+            else:
+                questions[number] = {
+                    'title': '未命名',
+                    'description': '沒有敘述',
+                    'tag': '',
+                    'deadline': int_questions[number][0],
+                    'submit': int_questions[number][1],
+                    'status': int_questions[number][2],
+                    'language': int_questions[number][3],
+                    'results': users[userid]['api'].list_results(number, userid),
+                }
+
+        for number in questions:
+            if len(questions[number]['results']) == 0:
+                questions[number]['result'] = 2
+            else:
+                results = []
+                raw = questions[number]['results']
+                for result in raw:
+                   results += [result[1]]
+
+                results = list(map(lambda x: x == '通過測試', results))
+
+                if False in results:
+                    questions[number]['result'] = 0
+                else:
+                    questions[number]['result'] = 1
+
+        question = questions[question_number]
+
+        results = []
+        raw = question['results']
+        for result in raw:
+           results += [result]
+
+        display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
+
+        return render_template('question_number.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results)
     if request.method == 'POST':
         # TODO: 提交程式碼內容到作業網站。
         return "POST /question/" + number

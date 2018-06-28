@@ -1,5 +1,5 @@
-{% include 'header.html' %}
-{% block head %}
+{% extends "base.html" %}
+{% block body %}
 <link rel="stylesheet" type="text/css" href="/static/css/question_number.css">
 <!-- 主要版面 -->
 <main class='container'>
@@ -12,17 +12,11 @@
 
         <!-- 測資結果 -->
         <ul class="test-case-list">
-            {# 
-                case_results: 所有測試案例的結果
-                result: 迭代於case_results中的測試結果
-            #}
-            {% for result in case_results %}
-                {% if result.flag == 'success' %}
-                    <li class="case-item passed">{{ result.number }} <span class="case-msg">{{ result.message }}</span></li>
-                {% elif result.flag == 'failed' %}
-                    <li class="case-item not-passed">{{ result.number }} <span class="case-msg">{{ result.message }}</span></li>
-                {% else %}
-                    <li class="case-item not-answered">{{ result.number }} <span class="case-msg">{{ result.message }}</span></li>
+            {% for result in results %}
+                {% if result[0] == 1 %}
+                    <li class="case-item passed"> {{  result[1]  }} <span class="case-msg">{{ result[2] }}</span></li>
+                {% elif result[0] == 0 %}
+                    <li class="case-item not-passed"> {{  result[1]  }} <span class="case-msg">{{ result[2] }}</span></li>
                 {% endif %}
             {% endfor %}
         </ul>
@@ -52,4 +46,4 @@
         </div>
     </div>
 </main>
-{% blockend head %}
+{% endblock %}
