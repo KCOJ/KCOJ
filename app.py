@@ -206,8 +206,8 @@ def question_page():
             }
         else:
             questions[number] = {
-                'title': '',
-                'description': '',
+                'title': '未命名',
+                'description': '沒有敘述',
                 'tag': '',
                 'deadline': int_questions[number][0],
                 'submit': int_questions[number][1],
@@ -215,9 +215,18 @@ def question_page():
                 'language': int_questions[number][3],
             }
 
+    close_questions = {}
+    open_questions = {}
+
+    for number in questions:
+        if questions[number]['submit'] == '期限已到':
+            close_questions[number] = questions[number]
+        else:
+            open_questions[number] = questions[number]
+
     userid = current_user.get_id()
 
-    return render_template('question.html', title="KCOJ - 題庫", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30))
+    return render_template('question.html', title="KCOJ - 題庫", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), course=KCOJ(URL).get_courses()[int(users[userid]['course']) - 1], open_questions=open_questions, close_questions=close_questions)
     return str(questions)
 
 # 作業題目畫面
