@@ -4,11 +4,11 @@ body {
 }
 
 .color-deep-gray { color: #555555; }
-.color-theme { color: #19cf86; }
-.color-subtheme { color: #e8faf2; }
+.color-theme { color: black; }
+.color-subtheme { color: #ffffff; }
 
-.bg-theme { background-color: #19cf86; }
-.bg-subtheme { background-color: #e8faf2; }
+.bg-theme { background-color: #61ccf6; }
+.bg-subtheme { background-color: #ffffff; }
 
 .mt-note { margin-top: 22.5%; }
 
@@ -29,7 +29,6 @@ section {
     background-color: rgba(255, 255, 255, 0.7);
     border: 1px solid black;
     margin-left: 0;
-    box-shadow: -3px 0 5px #333;
 }
 
 div.caption-pad {
@@ -39,8 +38,8 @@ div.caption-pad {
 
 div.login-pad {
     height: 70%;
-    background-color: #e8faf2;
-    color: #19cf86;
+    background-color: #ffffff;
+    color: black;
     padding: 7% 10%;
     border-top: 1px solid black;
 }
