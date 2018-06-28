@@ -215,6 +215,9 @@ def question_page():
                 'language': int_questions[number][3],
             }
 
+    userid = current_user.get_id()
+
+    return render_template('question.html', title="KCOJ - 題庫", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30))
     return str(questions)
 
 # 作業題目畫面

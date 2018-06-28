@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block body %}
+<link rel="stylesheet" type="text/css" href="/static/css/question.css">
+
+<!-- 網頁主區塊 -->
+<main class="container">
+    <!-- 區塊標題 -->
+    <div class="row heading">
+        <div class="col-12 d-flex align-items-center px-3 py-3 text-white-50 bg-blue heading-pad">
+            <div class="lh-100">
+                <h4 class="mb-0 text-white lh-100">計算機程式設計（二）</h4>
+                <small>Semester 2 2018</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 開放中的題目 -->
+    <div class="row mb-3">
+        <h3 class='question-section-title'>開放中的題目</h3>
+        <hr class="hr-line">
+        <div class='question-system'>
+
+            <div class='question-item' tabindex='0'>
+                <div class="state passed">030</div>
+                <div class='question-info'>
+                    <h4 class='question-title'><a href='30'>方程式運算問題</a></h4>
+                    <p class='question-description'>給定兩個方程式與運算（加、減、乘、除），算出運算式的結果。</p>
+                    <div class='label-pool'>
+                        <label>Array</label>
+                        <label>Recursion</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='question-item' tabindex='0'>
+                <div class="state not-passed">029</div>
+                <div class='question-info'>
+                    <h4 class='question-title'><a href='29'>最佳路徑問題</a></h4>
+                    <p class='question-description'>給定 N 個節點與節點之間的 M 個權重，求出起迄之間的最佳路徑。</p>
+                    <div class='label-pool'>
+                        <label>Node</label>
+                        <label>Pointer</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class='question-item' tabindex='0'>
+                <div class="state not-answered">028</div>
+                <div class='question-info'>
+                    <h4 class='question-title'><a href='28'>節點（Node）指標練習</a></h4>
+                    <p class='question-description'>運用上課時所教的知識，實作出串列鏈結的資料結構。</p>
+                    <div class='label-pool'>
+                        <label>Node</label>
+                        <label>Pointer</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 已結束的題目 -->
+    <div class="row">
+        <h3 class='question-section-title'>已結束的題目</h3>
+        <hr class="hr-line">
+        <div class='question-system'>
+
+            <div class='question-item' tabindex='0'>
+                <div class="state passed">027</div>
+                <div class='question-info'>
+                    <h4 class='question-title'><a href='27'>第27題</a></h4>
+                    <p class='question-description'>第27題的敘述</p>
+                    <div class='label-pool'>
+                        <label>Label1</label>
+                        <label>Label2</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class='question-item' tabindex='0'>
+                <div class="state passed">026</div>
+                <div class='question-info'>
+                    <h4 class='question-title'><a href='26'>第26題</a></h4>
+                    <p class='question-description'>第26題的敘述</p>
+                    <div class='label-pool'>
+                        <label>Label1</label>
+                        <label>Label2</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class='question-item' tabindex='0'>
+                <div class="state passed">025</div>
+                <div class='question-info'>
+                    <h4 class='question-title'><a href='25'>第25題</a></h4>
+                    <p class='question-description'>第25題的敘述</p>
+                    <div class='label-pool'>
+                        <label>Label1</label>
+                        <label>Label2</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
