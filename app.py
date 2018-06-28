@@ -62,9 +62,9 @@ def root_page():
     if not keep_login():
         logout_user()
 
-    # TODO: 顯示主畫面
-    return render_template('home.html', title="KCOJ - 首頁", account=current_user.get_id(), gravatar=get_gravatar(30))
-    return #str(users[current_user.get_id()]['api'].get_notices())
+    userid = current_user.get_id()
+    # 顯示主畫面
+    return render_template('home.html', title="KCOJ - 首頁", account=userid, gravatar=get_gravatar(30), notices=users[userid]['api'].get_notices())
 
 # 登入失敗回到登入畫面
 @login_manager.unauthorized_handler

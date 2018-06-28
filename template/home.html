@@ -11,56 +11,16 @@
     <h2 id='announcement' class='text-center mt-3'>- 公告 -</h2>
     <hr class='mt-3 mb-3'>
 
-    
+    {% for notice in notices %}   
     <div class="card my-3">
         <h3 class="card-header text-center">
-            第 14 週的題目已經公佈了！
+            {{  notice[1]  }}
         </h3>
         <div class="card-body">
-            <p>第 14 週的題目已經公佈在題庫中了！</p>
-            <p>這一週有 3 個題目，詳細內容如下：</p>
-            <table class="table table-bordered">
-                <thead class="thead-light">
-                    <tr>
-                    <th scope="col">題號</th>
-                    <th scope="col">題目</th>
-                    <th scope="col">簡述</th>
-                    <th scope="col">期限</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">030</th>
-                        <td><a href='content.html?num=030'>方程式運算問題</a></td>
-                        <td>給定兩個方程式與運算（加、減、乘、除），算出運算式的結果。</td>
-                        <td>2018/05/05 23:59:59</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">029</th>
-                        <td><a href='content.html?num=029'>最佳路徑問題</a></td>
-                        <td>給定 N 個節點與節點之間的 M 個權重，求出起迄之間的最佳路徑。</td>
-                        <td>2018/05/05 23:59:59</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">028</th>
-                        <td><a href='content.html?num=0028'>節點（Node）指標練習</a></td>
-                        <td>運用上課時所教的知識，實作出串列鏈結的資料結構。</td>
-                        <td>2018/05/05 23:59:59</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><em>注意！</em> 以上的題目請建議使用<b>「串列鏈結」</b>的資料結構下去實作，程式撰寫起來會比較輕鬆喔！</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            <pre>{{  notice[2]  }}</pre>
+            <p class="card-text"><small class="text-muted">{{  notice[0]  }}</small></p>
         </div>
     </div>
-    <div class="card my-3">
-        <h3 class="card-header text-center">
-            KCOJ 已經開放！
-        </h3>
-        <div class="card-body">
-            <p>Kuo C Online Judge 已經開放！對於有想要做題目來精進自己程式能力的你，趕快來這裡練習吧！</p>
-            <p class="card-text"><small class="text-muted">Last updated 12 days ago</small></p>
-        </div>
-    </div>
+    {% endfor %}
 </main>
 {% endblock %}
