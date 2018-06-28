@@ -328,7 +328,7 @@ def question_number_page(number):
 
         display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
 
-        return render_template('question_number.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results)
+        return render_template('question_number.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results, status=question['result'])
     if request.method == 'POST':
         # TODO: 提交程式碼內容到作業網站。
         return "POST /question/" + number
@@ -400,7 +400,7 @@ def question_number_forum_page(number):
 
         display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
 
-        return render_template('question_number_forum.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results)
+        return render_template('question_number_forum.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results, status=question['result'])
     if request.method == 'POST':
         # TODO: 新增討論文章。
         return "POST /question/" + number + "chat"
@@ -470,7 +470,7 @@ def question_number_passed_page(number):
 
     display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
 
-    return render_template('question_number_passed.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results, passers=users[current_user.get_id()]['api'].list_passers(number))
+    return render_template('question_number_passed.html', title=("KCOJ - " + question_number), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), question_number=question_number, question_title=question['title'], content=content, results=display_results, passers=users[current_user.get_id()]['api'].list_passers(number), status=question['result'])
 
 # 登出沒有畫面
 @app.route('/logout', methods=['GET'], strict_slashes=False)

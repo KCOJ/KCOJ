@@ -6,7 +6,13 @@
     <div class="row">
         <!-- 題目的標題列：解題狀態與題目名稱 -->
         <div class="title-pad">
-            <div class="state passed">{{ question_number }}</div>
+            <div class="state {% if status == 2 %}
+            not-answered
+            {% elif status == 1 %}
+            passed
+            {% elif status == 0 %}
+            not-passed
+            {% endif %}">{{ question_number }}</div>
             <h1 class='title'>{{ question_title }}</h1>
         </div>
 
