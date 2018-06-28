@@ -57,14 +57,14 @@ def get_gravatar(size):
 # 主畫面
 @app.route('/', methods=['GET'], strict_slashes=False)
 @login_required
-def root_page():
+def index_page():
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
 
     userid = current_user.get_id()
     # 顯示主畫面
-    return render_template('home.html', title="KCOJ - 首頁", account=userid, gravatar=get_gravatar(30), notices=users[userid]['api'].get_notices())
+    return render_template('index.html', title="KCOJ - 首頁", account=userid, gravatar=get_gravatar(30), notices=users[userid]['api'].get_notices())
 
 # 登入失敗回到登入畫面
 @login_manager.unauthorized_handler
