@@ -51,8 +51,8 @@ def keep_login():
     return user['api'].check_online()
 
 # 取得 Gravatar 上的大頭貼
-def get_gravatar(size):
-    return 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(users[current_user.get_id()]['email'], 'utf-8')).hexdigest() + '?size=' + str(size)
+def get_gravatar(email, size):
+    return 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(email, 'utf-8')).hexdigest() + '?size=' + str(size)
 
 # 主畫面
 @app.route('/', methods=['GET'], strict_slashes=False)
@@ -64,7 +64,7 @@ def index_page():
 
     userid = current_user.get_id()
     # 顯示主畫面
-    return render_template('index.html', title="KCOJ - 首頁", account=userid, gravatar=get_gravatar(30), notices=users[userid]['api'].get_notices())
+    return render_template('index.html', title="KCOJ - 首頁", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), notices=users[userid]['api'].get_notices())
 
 # 登入失敗回到登入畫面
 @login_manager.unauthorized_handler
@@ -122,22 +122,18 @@ def user_page():
     if request.method == 'GET':
         # TODO: 顯示 Gravatar 大頭貼和變更密碼的欄位，
         # 不過在顯示別人的資料（?id=）時不會出現變更密碼的欄位。
-        email = users[current_user.get_id()]['email']
-        gravatar_url = 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(email, 'utf-8')).hexdigest() + '?size=200'
-        temp = """
-            <img src="{0}" alt="gravatar">
-            <pre>{1}</pre>
-            <form action='/user' method='POST'>
-                old_passwd: <input name='old_passwd' type='password' required/>
-                <br>
-                new_passwd: <input name='new_passwd' type='password'/>
-                <br>
-                email: <input name='email' type='email'/>
-                <br>
-                <input value='Submit' type='submit'/>
-            </form>
-        """.format(gravatar_url, email)
-        return Response(temp, content_type='text/html; charset=utf-8')
+
+        userid = current_user.get_id()
+
+        try:
+            view_userid = request.args['userid']
+            view_email = users[view_userid]['email']
+        except:
+            view_userid = userid
+            view_email = users[userid]['email']
+
+        return render_template('user.html', title=("KCOJ - " + view_userid), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), view_userid=view_userid, view_email=view_email, view_gravatar=get_gravatar(users[view_userid]['email'], 200))
+
     if request.method == 'POST':
         # TODO: 判斷舊密碼是否正確，正確的話更新資料。
         # 取得更新資訊

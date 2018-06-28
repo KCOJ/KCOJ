@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block body %}
+<link rel="stylesheet" type="text/css" href="static/css/user.css">
+    
+<!-- 主要版面 -->
+<main class='container mt-3'>
+    <h1 class="text-center text-shadow">使用者資訊</h1>
+    <div class="personal-card">
+        <div class="flex-center">
+            <img class="personal-image" src="{{  view_gravatar  }}" alt="Gravatar Image">
+        </div>
+        <div class="personal-info">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">學號</span>
+                </div>
+                <input type="text" class="form-control" value="{{  view_userid  }}" disabled>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">信箱</span>
+                </div>
+                <input type="text" class="form-control" value="{{  view_email  }}" disabled>
+            </div>
+            <hr>
+            <!-- 更新資訊 -->
+            <h5 class="text-center text-shadow">更新資訊</h5>
+            <form action="/user" method="POST">
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" name="old_passwd" placeholder="目前密碼" aria-label="old_passwd" required>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" name="new_passwd" placeholder="新密碼（可留白）" aria-label="new_passwd">
+                </div>
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" name="email" placeholder="電子郵件地址（可留白）" aria-label="email">
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">送出</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}
