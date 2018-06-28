@@ -190,7 +190,7 @@ def question_page():
     if not keep_login():
         logout_user()
 
-    # TODO: 顯示題目列表。
+    # 顯示題目列表。
     userid = current_user.get_id()
 
     questions = {}
@@ -257,7 +257,6 @@ def question_page():
                 else:
                     open_questions[number]['result'] = 1
 
-    # return str(close_questions)
     return render_template('question.html', title="KCOJ - 題庫", userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), course=KCOJ(URL).get_courses()[int(users[userid]['course']) - 1], open_questions=open_questions, close_questions=close_questions)
 
 # 作業題目畫面
