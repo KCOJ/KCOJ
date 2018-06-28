@@ -120,19 +120,24 @@ def user_page():
         logout_user()
 
     if request.method == 'GET':
-        # TODO: 顯示 Gravatar 大頭貼和變更密碼的欄位，
-        # 不過在顯示別人的資料（?id=）時不會出現變更密碼的欄位。
+        # TODO: 在顯示別人的資料（?id=）時不會出現變更密碼的欄位。
 
         userid = current_user.get_id()
 
         try:
             view_userid = request.args['userid']
-            view_email = users[view_userid]['email']
-        except:
+        except KeyError:
             view_userid = userid
-            view_email = users[userid]['email']
 
-        return render_template('user.html', title=("KCOJ - " + view_userid), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), view_userid=view_userid, view_email=view_email, view_gravatar=get_gravatar(users[view_userid]['email'], 200))
+        try:
+            view_email = users[view_userid]['email']
+        except KeyError:
+            if view_userid == userid:
+                view_email = users[userid]['email']
+            else:
+                view_email = ''
+
+        return render_template('user.html', title=("KCOJ - " + view_userid), userid=userid, gravatar=get_gravatar(users[userid]['email'], 30), view_userid=view_userid, view_email=view_email, view_gravatar=get_gravatar(view_email, 200))
 
     if request.method == 'POST':
         # TODO: 判斷舊密碼是否正確，正確的話更新資料。
