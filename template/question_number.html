@@ -1,0 +1,55 @@
+{% include 'header.html' %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/static/css/question_number.css">
+<!-- 主要版面 -->
+<main class='container'>
+    <div class="row">
+        <!-- 題目的標題列：解題狀態與題目名稱 -->
+        <div class="title-pad">
+            <div class="state passed">{{ question_number }}</div>
+            <h1 class='title'>{{ question_title }}</h1>
+        </div>
+
+        <!-- 測資結果 -->
+        <ul class="test-case-list">
+            {# 
+                case_results: 所有測試案例的結果
+                result: 迭代於case_results中的測試結果
+            #}
+            {% for result in case_results %}
+                {% if result.flag == 'success' %}
+                    <li class="case-item passed">{{ result.number }} <span class="case-msg">{{ result.message }}</span></li>
+                {% elif result.flag == 'failed' %}
+                    <li class="case-item not-passed">{{ result.number }} <span class="case-msg">{{ result.message }}</span></li>
+                {% else %}
+                    <li class="case-item not-answered">{{ result.number }} <span class="case-msg">{{ result.message }}</span></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <!-- 分頁標籤 -->
+        <ul class="nav nav-tabs page-tab">
+            <li class="nav-item">
+                <a class="nav-link active">題目內容</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/question/{{ question_number }}/char">討論區</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/question/{{ question_number }}/passed">通過者名單</a>
+            </li>
+        </ul>
+
+        <!-- 題目內容 -->
+        <pre class="content">{{ content }}</pre>
+        <hr>
+
+        <!-- 程式碼輸入區 -->
+        <label for="txaCode">程式碼：</label>
+        <textarea name="code" id="txaCode" cols="30" rows="10" class="coding-area"></textarea>
+        <div class="action-bar">
+            <button class="btn btn-primary">送出答案</button>
+        </div>
+    </div>
+</main>
+{% blockend head %}
