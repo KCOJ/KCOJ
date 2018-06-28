@@ -21,28 +21,20 @@
             <!-- 登入表單 -->
             <form action="/login" method="POST">
                 <div class="input-group mb-3 mt-5">
-                    <input type="text" name="userid" class="form-control" placeholder="學號" aria-label="Username" aria-describedby="basic-addon1">
+                        <input type="text" name="userid" class="form-control" placeholder="學號" aria-label="Username" aria-describedby="basic-addon1">
                 </div>
                 <div class="input-group mb-3">
-                    <input type="password" name="passwd" class="form-control" placeholder="密碼" aria-label="Username" aria-describedby="basic-addon2">
+                        <input type="password" name="passwd" class="form-control" placeholder="密碼" aria-label="Username" aria-describedby="basic-addon2">
                 </div>
                 <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text bg-theme" for="inputGroupSelect01">課程</label>
-                    </div>
                     <select class="custom-select" name="course" id="inputGroupSelect01">
                         {% for name in courses %}
                             <option value={{ name }}>{{ name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                {% if error_message %}
-                <div class="input-group mb-3 alert alert-danger">
-                    {{ error_message }}
-                </div>
-                {% endif %}
                 <div class="input-group d-flex justify-content-center">
-                    <button type="submit" class="btn bg-theme">登入</button>
+                        <button type="submit" class="btn btn-primary">登入</button>
                 </div>
             </form>
             <p class='mt-note text-center color-deep-gray'>&copy; Kuo C Online Judge 2018</p>
