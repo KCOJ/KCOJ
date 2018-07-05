@@ -6,11 +6,11 @@
     <div class="row">
         <!-- 題目的標題列：解題狀態與題目名稱 -->
         <div class="title-pad">
-            <div class="state {% if status== 2 %}
+            <div class="state {% if question_light == 2 %}
             not-answered
-            {% elif status == 1 %}
+            {% elif question_light == 1 %}
             passed
-            {% elif status == 0 %}
+            {% elif question_light == 0 %}
             not-passed
             {% endif %}">{{ question_number }}</div>
             <h1 class='title'>{{ question_title }}</h1>
@@ -18,11 +18,11 @@
 
         <!-- 測資結果 -->
         <ul class="test-case-list">
-            {% for result in results %}
-                {% if result[0] == 1 %}
-                    <li class="case-item passed"> {{  result[1]  }} <span class="case-msg">{{ result[2] }}</span></li>
-                {% elif result[0] == 0 %}
-                    <li class="case-item not-passed"> {{  result[1]  }} <span class="case-msg">{{ result[2] }}</span></li>
+            {% for case in question_cases %}
+                {% if case[0] == True %}
+                    <li class="case-item passed"> {{  case[1]  }} <span class="case-msg">{{ case[2] }}</span></li>
+                {% else %}
+                    <li class="case-item not-passed"> {{  case[1]  }} <span class="case-msg">{{ case[2] }}</span></li>
                 {% endif %}
             {% endfor %}
         </ul>
@@ -41,7 +41,7 @@
         </ul>
 
         <!-- 題目內容 -->
-        <pre class="content">{{ content }}</pre>
+        <pre class="content">{{ question_content }}</pre>
         <hr>
 
         <!-- 程式碼輸入區 -->

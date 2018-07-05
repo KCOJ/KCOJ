@@ -21,8 +21,12 @@ app.config.from_pyfile('config.py')
 login_manager = LoginManager(app)
 
 # 寫死的題目標題、敘述、標籤
-with open('questions.json', 'r') as f:
+try:
+    f = open('questions.json', 'r')
     ext_questions = json.load(f)
+    f.close()
+except FileNotFoundError:
+    ext_questions = {}
 
 # 儲存使用者資訊
 users = {}  
@@ -41,14 +45,19 @@ def user_loader(userid):
 
 # 試著保持著登入狀態
 def keep_login():
-    user = users[current_user.get_id()]
+    useruid = current_user.get_id()
     # 確認是否是登入狀態
-    if user['api'].check_online():
+    if users[useruid]['api'].check_online():
         return True
     # 如果不是登入狀態就嘗試登入
-    user['api'].login(user['userid'], user['passwd'], user['course'])
+    try:
+        users[useruid]['api'].login(users[useruid]['userid'], 
+                                    users[useruid]['passwd'], 
+                                    KCOJ(URL).get_courses().index(users[useruid]['course']) + 1)
+    except IndexError:
+        return False
     # 回傳登入狀態
-    return user['api'].check_online()
+    return users[useruid]['api'].check_online()
 
 # 取得 Gravatar 上的大頭貼
 def get_gravatar(email, size):
@@ -62,13 +71,13 @@ def index_page():
     if not keep_login():
         logout_user()
 
-    userid = current_user.get_id()
+    useruid = current_user.get_id()
     # 顯示主畫面
     return render_template('index.html',
                            title="KCOJ - 首頁",
-                           userid=userid,
-                           gravatar=get_gravatar(users[userid]['email'], 30),
-                           notices=users[userid]['api'].get_notices())
+                           userid=users[useruid]['userid'],
+                           gravatar=get_gravatar(users[useruid]['email'], 30),
+                           notices=users[useruid]['api'].get_notices())
 
 # 登入失敗回到登入畫面
 @login_manager.unauthorized_handler
@@ -89,21 +98,19 @@ def login_page():
         # 取得登入資訊
         userid = request.form['userid']
         passwd = request.form['passwd']
-        try:
-            course = api.get_courses().index(request.form['course']) + 1
-        except ValueError:
-            course = 0
+        course = request.form['course']
+        useruid = userid + course
         # 登入交作業網站
-        api.login(userid, passwd, course)
+        api.login(userid, passwd, api.get_courses().index(course) + 1)
         # 確認是否登入成功
         if api.check_online():
             # 登入成功
-            login_user(User(userid))
+            login_user(User(useruid))
             # 將登入資訊儲存起來
-            if userid in users:
-                users[userid]['api'] = api
+            if useruid in users:
+                users[useruid]['api'] = api
             else:
-                users[userid] = {
+                users[useruid] = {
                     'userid': userid,
                     'passwd': passwd,
                     'course': course,
@@ -127,49 +134,53 @@ def user_page():
         logout_user()
 
     if request.method == 'GET':
-        # TODO: 在顯示別人的資料（?id=）時不會出現變更密碼的欄位。
-
-        userid = current_user.get_id()
-
+        # 使用者的 ID
+        useruid = current_user.get_id()
+        userid = users[useruid]['userid']
+        # 要查看的使用者 ID
         try:
             view_userid = request.args['userid']
         except KeyError:
             view_userid = userid
-
+        # 要查看的使用者 Email
         try:
-            view_email = users[view_userid]['email']
+            view_email = users[view_userid + users[useruid]['course']]['email']
         except KeyError:
             if view_userid == userid:
-                view_email = users[userid]['email']
+                # 如果查看是自己的話就顯示自己的 Email
+                view_email = users[useruid]['email']
             else:
                 view_email = ''
 
         return render_template('user.html',
                                title=("KCOJ - " + view_userid),
-                               userid=userid, gravatar=get_gravatar(users[userid]['email'], 30),
+                               userid=userid, 
+                               gravatar=get_gravatar(users[useruid]['email'], 30),
                                view_userid=view_userid,
                                view_email=view_email,
                                view_gravatar=get_gravatar(view_email, 200),
                                no_me=(userid != view_userid))
 
     if request.method == 'POST':
+        # 使用者的 ID
+        useruid = current_user.get_id()
+        userid = users[useruid]['userid']
         # 取得更新資訊
-        userid = current_user.get_id()
         old_passwd = request.form['old_passwd']
         new_passwd = request.form['new_passwd']
         email = request.form['email']
         # 登入交作業網站
         api = KCOJ(URL)
-        api.login(userid, old_passwd, users[userid]['course'])
+        api.login(userid, old_passwd, users[useruid]['course'])
         # 確認是否登入成功
         if api.check_online():
             # 如果要變更密碼
             if new_passwd != '':
                 api.change_password(new_passwd)
-                users[userid]['passwd'] = new_passwd
+                users[useruid]['passwd'] = new_passwd
             # 如果要變更 Email
             if email != '':
-                users[userid]['email'] = email
+                users[useruid]['email'] = email
                 
         return redirect('/user')
 
@@ -181,22 +192,14 @@ def docs_page():
     if not keep_login():
         logout_user()
 
-    userid = current_user.get_id()
+    # 使用者的 ID
+    useruid = current_user.get_id()
+    userid = users[useruid]['userid']
 
     return render_template('docs.html',
                            title="KCOJ - 程式技巧",
-                           userid=userid, gravatar=get_gravatar(users[userid]['email'], 30))
-
-# 技巧文件畫面
-@app.route('/docs/<name>', methods=['GET'], strict_slashes=False)
-@login_required
-def docs_name_page(name):
-    # 嘗試保持登入狀態
-    if not keep_login():
-        logout_user()
-
-    # TODO: 顯示該篇文件。
-    return "GET /docs/" + name
+                           userid=userid, 
+                           gravatar=get_gravatar(users[useruid]['email'], 30))
 
 # 作業題庫畫面
 @app.route('/question', methods=['GET'], strict_slashes=False)
@@ -206,80 +209,76 @@ def question_page():
     if not keep_login():
         logout_user()
 
-    # 顯示題目列表。
-    userid = current_user.get_id()
+    # 使用者的 ID
+    useruid = current_user.get_id()
+    userid = users[useruid]['userid']
 
+    # 顯示題目列表
     questions = {}
-    int_questions = users[userid]['api'].list_questions()
 
-    for number in int_questions:
-        if number in ext_questions:
-            questions[number] = {
-                'title': ext_questions[number]['title'],
-                'description': ext_questions[number]['description'],
-                'tag': ext_questions[number]['tag'],
-                'deadline': int_questions[number][0],
-                'submit': int_questions[number][1],
-                'status': int_questions[number][2],
-                'language': int_questions[number][3],
-                'results': users[userid]['api'].list_results(number, userid),
-            }
-        else:
-            questions[number] = {
-                'title': '未命名',
-                'description': '沒有敘述',
-                'tag': '',
-                'deadline': int_questions[number][0],
-                'submit': int_questions[number][1],
-                'status': int_questions[number][2],
-                'language': int_questions[number][3],
-                'results': users[userid]['api'].list_results(number, userid),
-            }
+    # 抓 API 裡的題目資訊
+    api_question = users[useruid]['api'].list_questions()
+    for num in api_question:
+        questions[num] = {
+            'title': '未命名',
+            'description': '沒有敘述',
+            'tag': '',
+            'deadline': api_question[num][0],
+            # 繳交期限是否到
+            'submit': api_question[num][1],
+            # 繳交狀態
+            'status': api_question[num][2],
+            'language': api_question[num][3],
+            'results': users[useruid]['api'].list_results(num, userid),
+        }
+    
+    # 抓外部寫死的題目資訊
+    for num in ext_questions:
+        # 如果 API 沒有這題就跳過
+        if not num in api_question:
+            continue
+        # 新增外部資訊
+        questions[num]['title'] = ext_questions[num]['title']
+        questions[num]['description'] = ext_questions[num]['description']
+        questions[num]['tag'] = ext_questions[num]['tag']
 
-    close_questions = {}
-    open_questions = {}
+    closed = {}
+    opened = {}
 
-    for number in questions:
-        if questions[number]['submit'] == '期限已到':
-            close_questions[number] = questions[number]
-            if len(close_questions[number]['results']) == 0:
-                close_questions[number]['result'] = 2
+    for num in questions:
+        # 判斷題目是否關閉
+        if questions[num]['submit'] == '期限已到':
+            # 收錄至已關閉的題目
+            closed[num] = questions[num]
+            if len(closed[num]['results']) == 0:
+                # 題目燈號為未繳交
+                closed[num]['light'] = 2
             else:
                 results = []
-                raw = close_questions[number]['results']
-                for result in raw:
-                    results += [result[1]]
-
-                results = list(map(lambda x: x == '通過測試', results))
-
-                if False in results:
-                    close_questions[number]['result'] = 0
-                else:
-                    close_questions[number]['result'] = 1
+                for result in closed[num]['results']:
+                    results += [result[1] == '通過測試']
+                # 題目燈號為已／未繳交
+                closed[num]['light'] = 0 if False in results else 1
         else:
-            open_questions[number] = questions[number]
-            if len(open_questions[number]['results']) == 0:
-                open_questions[number]['result'] = 2
+            # 收錄至仍開啟的題目
+            opened[num] = questions[num]
+            if len(opened[num]['results']) == 0:
+                # 題目燈號為未繳交
+                opened[num]['light'] = 2
             else:
                 results = []
-                raw = open_questions[number]['results']
-                for result in raw:
-                    results += [result[1]]
-
-                results = list(map(lambda x: x == '通過測試', results))
-
-                if False in results:
-                    open_questions[number]['result'] = 0
-                else:
-                    open_questions[number]['result'] = 1
+                for result in opened[num]['results']:
+                    results += [result[1] == '通過測試']
+                # 題目燈號為已／未繳交
+                opened[num]['light'] = 0 if False in results else 1
 
     return render_template('question.html',
-                           title="KCOJ - 題庫",
+                           title="KCOJ - " + users[useruid]['course'] + " 題庫",
                            userid=userid,
-                           gravatar=get_gravatar(users[userid]['email'], 30),
-                           course=KCOJ(URL).get_courses()[int(users[userid]['course']) - 1],
-                           open_questions=open_questions,
-                           close_questions=close_questions)
+                           gravatar=get_gravatar(users[useruid]['email'], 30),
+                           course=users[useruid]['course'],
+                           opened_questions=opened,
+                           closed_questions=closed)
 
 # 作業題目畫面
 @app.route('/question/<number>/content', methods=['GET', 'POST'], strict_slashes=False)
@@ -291,73 +290,67 @@ def question_number_page(number):
         logout_user()
 
     if request.method == 'GET':
-        userid = current_user.get_id()
+        # 使用者的 ID
+        useruid = current_user.get_id()
+        userid = users[useruid]['userid']
 
-        content = users[userid]['api'].show_question(number)
-
-        question_number = number
-
+        # 顯示題目列表
         questions = {}
-        int_questions = users[userid]['api'].list_questions()
 
-        for number in int_questions:
-            if number in ext_questions:
-                questions[number] = {
-                    'title': ext_questions[number]['title'],
-                    'description': ext_questions[number]['description'],
-                    'tag': ext_questions[number]['tag'],
-                    'deadline': int_questions[number][0],
-                    'submit': int_questions[number][1],
-                    'status': int_questions[number][2],
-                    'language': int_questions[number][3],
-                    'results': users[userid]['api'].list_results(number, userid),
-                }
-            else:
-                questions[number] = {
-                    'title': '未命名',
-                    'description': '沒有敘述',
-                    'tag': '',
-                    'deadline': int_questions[number][0],
-                    'submit': int_questions[number][1],
-                    'status': int_questions[number][2],
-                    'language': int_questions[number][3],
-                    'results': users[userid]['api'].list_results(number, userid),
-                }
+        # 抓 API 裡的題目資訊
+        api_question = users[useruid]['api'].list_questions()
+        for num in api_question:
+            questions[num] = {
+                'title': '未命名',
+                'description': '沒有敘述',
+                'tag': '',
+                'deadline': api_question[num][0],
+                # 繳交期限是否到
+                'submit': api_question[num][1],
+                # 繳交狀態
+                'status': api_question[num][2],
+                'language': api_question[num][3],
+                'results': users[useruid]['api'].list_results(num, userid),
+            }
 
-        for number in questions:
-            if len(questions[number]['results']) == 0:
-                questions[number]['result'] = 2
-            else:
-                results = []
-                raw = questions[number]['results']
-                for result in raw:
-                   results += [result[1]]
+        # 抓外部寫死的題目資訊
+        for num in ext_questions:
+            # 如果 API 沒有這題就跳過
+            if not num in api_question:
+                continue
+            questions[num]['title'] = ext_questions[num]['title']
+            questions[num]['description'] = ext_questions[num]['description']
+            questions[num]['tag'] = ext_questions[num]['tag']
+    
+        # 選擇特定的題目
+        question = questions[number]
+        
+        if len(question['results']) == 0:
+            # 題目燈號為未繳交
+            question['light'] = 2
+        else:
+            results = []
+            for result in question['results']:
+                results += [result[1] == '通過測試']
+            # 題目燈號為已／未繳交
+            question['light'] = 0 if False in results else 1
 
-                results = list(map(lambda x: x == '通過測試', results))
+        test_cases = []
+        for result in question['results']:
+           test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-                if False in results:
-                    questions[number]['result'] = 0
-                else:
-                    questions[number]['result'] = 1
-
-        question = questions[question_number]
-
-        results = []
-        raw = question['results']
-        for result in raw:
-           results += [result]
-
-        display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
+        content = users[useruid]['api'].show_question(number)
 
         return render_template('question_number.html',
-                               title=("KCOJ - " + question_number),
+                               title=("KCOJ - " + users[useruid]['course'] + " " + number),
                                userid=userid,
-                               gravatar=get_gravatar(users[userid]['email'], 30),
-                               question_number=question_number,
+                               gravatar=get_gravatar(users[useruid]['email'], 30),
+                               question_number=number,
                                question_title=question['title'],
-                               content=content,
-                               results=display_results,
-                               status=question['result'])
+                               question_content=content,
+                               question_cases=test_cases,
+                               question_light=question['light'])
+
     if request.method == 'POST':
         # TODO: 提交程式碼內容到作業網站。
         return "POST /question/" + number
@@ -371,73 +364,67 @@ def question_number_forum_page(number):
         logout_user()
 
     if request.method == 'GET':
-        userid = current_user.get_id()
+        # 使用者的 ID
+        useruid = current_user.get_id()
+        userid = users[useruid]['userid']
 
-        content = users[userid]['api'].show_question(number)
-
-        question_number = number
-
+        # 顯示題目列表
         questions = {}
-        int_questions = users[userid]['api'].list_questions()
 
-        for number in int_questions:
-            if number in ext_questions:
-                questions[number] = {
-                    'title': ext_questions[number]['title'],
-                    'description': ext_questions[number]['description'],
-                    'tag': ext_questions[number]['tag'],
-                    'deadline': int_questions[number][0],
-                    'submit': int_questions[number][1],
-                    'status': int_questions[number][2],
-                    'language': int_questions[number][3],
-                    'results': users[userid]['api'].list_results(number, userid),
-                }
-            else:
-                questions[number] = {
-                    'title': '未命名',
-                    'description': '沒有敘述',
-                    'tag': '',
-                    'deadline': int_questions[number][0],
-                    'submit': int_questions[number][1],
-                    'status': int_questions[number][2],
-                    'language': int_questions[number][3],
-                    'results': users[userid]['api'].list_results(number, userid),
-                }
+        # 抓 API 裡的題目資訊
+        api_question = users[useruid]['api'].list_questions()
+        for num in api_question:
+            questions[num] = {
+                'title': '未命名',
+                'description': '沒有敘述',
+                'tag': '',
+                'deadline': api_question[num][0],
+                # 繳交期限是否到
+                'submit': api_question[num][1],
+                # 繳交狀態
+                'status': api_question[num][2],
+                'language': api_question[num][3],
+                'results': users[useruid]['api'].list_results(num, userid),
+            }
 
-        for number in questions:
-            if len(questions[number]['results']) == 0:
-                questions[number]['result'] = 2
-            else:
-                results = []
-                raw = questions[number]['results']
-                for result in raw:
-                   results += [result[1]]
+        # 抓外部寫死的題目資訊
+        for num in ext_questions:
+            # 如果 API 沒有這題就跳過
+            if not num in api_question:
+                continue
+            questions[num]['title'] = ext_questions[num]['title']
+            questions[num]['description'] = ext_questions[num]['description']
+            questions[num]['tag'] = ext_questions[num]['tag']
+    
+        # 選擇特定的題目
+        question = questions[number]
+        
+        if len(question['results']) == 0:
+            # 題目燈號為未繳交
+            question['light'] = 2
+        else:
+            results = []
+            for result in question['results']:
+                results += [result[1] == '通過測試']
+            # 題目燈號為已／未繳交
+            question['light'] = 0 if False in results else 1
 
-                results = list(map(lambda x: x == '通過測試', results))
+        test_cases = []
+        for result in question['results']:
+           test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-                if False in results:
-                    questions[number]['result'] = 0
-                else:
-                    questions[number]['result'] = 1
-
-        question = questions[question_number]
-
-        results = []
-        raw = question['results']
-        for result in raw:
-           results += [result]
-
-        display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
+        content = users[useruid]['api'].show_question(number)
 
         return render_template('question_number_forum.html',
-                               title=("KCOJ - " + question_number),
+                               title=("KCOJ - " + users[useruid]['course'] + " " + number),
                                userid=userid,
-                               gravatar=get_gravatar(users[userid]['email'], 30),
-                               question_number=question_number,
+                               gravatar=get_gravatar(users[useruid]['email'], 30),
+                               question_number=number,
                                question_title=question['title'],
-                               content=content,
-                               results=display_results,
-                               status=question['result'])
+                               question_content=content,
+                               question_cases=test_cases,
+                               question_light=question['light'])
+
     if request.method == 'POST':
         # TODO: 新增討論文章。
         return "POST /question/" + number + "chat"
@@ -449,74 +436,68 @@ def question_number_passed_page(number):
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
-    userid = current_user.get_id()
 
-    content = users[userid]['api'].show_question(number)
+    # 使用者的 ID
+    useruid = current_user.get_id()
+    userid = users[useruid]['userid']
 
-    question_number = number
-
+    # 顯示題目列表
     questions = {}
-    int_questions = users[userid]['api'].list_questions()
 
-    for number in int_questions:
-        if number in ext_questions:
-            questions[number] = {
-                'title': ext_questions[number]['title'],
-                'description': ext_questions[number]['description'],
-                'tag': ext_questions[number]['tag'],
-                'deadline': int_questions[number][0],
-                'submit': int_questions[number][1],
-                'status': int_questions[number][2],
-                'language': int_questions[number][3],
-                'results': users[userid]['api'].list_results(number, userid),
-            }
-        else:
-            questions[number] = {
-                'title': '未命名',
-                'description': '沒有敘述',
-                'tag': '',
-                'deadline': int_questions[number][0],
-                'submit': int_questions[number][1],
-                'status': int_questions[number][2],
-                'language': int_questions[number][3],
-                'results': users[userid]['api'].list_results(number, userid),
-            }
+    # 抓 API 裡的題目資訊
+    api_question = users[useruid]['api'].list_questions()
+    for num in api_question:
+        questions[num] = {
+            'title': '未命名',
+            'description': '沒有敘述',
+            'tag': '',
+            'deadline': api_question[num][0],
+            # 繳交期限是否到
+            'submit': api_question[num][1],
+            # 繳交狀態
+            'status': api_question[num][2],
+            'language': api_question[num][3],
+            'results': users[useruid]['api'].list_results(num, userid),
+        }
 
-    for number in questions:
-        if len(questions[number]['results']) == 0:
-            questions[number]['result'] = 2
-        else:
-            results = []
-            raw = questions[number]['results']
-            for result in raw:
-               results += [result[1]]
+    # 抓外部寫死的題目資訊
+    for num in ext_questions:
+        # 如果 API 沒有這題就跳過
+        if not num in api_question:
+            continue
+        questions[num]['title'] = ext_questions[num]['title']
+        questions[num]['description'] = ext_questions[num]['description']
+        questions[num]['tag'] = ext_questions[num]['tag']
+    
+    # 選擇特定的題目
+    question = questions[number]
+        
+    if len(question['results']) == 0:
+        # 題目燈號為未繳交
+        question['light'] = 2
+    else:
+        results = []
+        for result in question['results']:
+            results += [result[1] == '通過測試']
+        # 題目燈號為已／未繳交
+        question['light'] = 0 if False in results else 1
 
-            results = list(map(lambda x: x == '通過測試', results))
+    test_cases = []
+    for result in question['results']:
+       test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-            if False in results:
-                questions[number]['result'] = 0
-            else:
-                questions[number]['result'] = 1
-
-    question = questions[question_number]
-
-    results = []
-    raw = question['results']
-    for result in raw:
-       results += [result]
-
-    display_results = list(map(lambda x: [int(x[1] == '通過測試'), x[0], x[1]], results))
+    content = users[useruid]['api'].show_question(number)
 
     return render_template('question_number_passed.html',
-                           title=("KCOJ - " + question_number),
+                           title=("KCOJ - " + users[useruid]['course'] + " " + number),
                            userid=userid,
-                           gravatar=get_gravatar(users[userid]['email'], 30),
-                           question_number=question_number,
+                           gravatar=get_gravatar(users[useruid]['email'], 30),
+                           question_number=number,
                            question_title=question['title'],
-                           content=content,
-                           results=display_results,
-                           passers=users[current_user.get_id()]['api'].list_passers(number),
-                           status=question['result'])
+                           question_content=content,
+                           question_cases=test_cases,
+                           question_light=question['light'],
+                           passers=users[useruid]['api'].list_passers(number))
 
 # 登出沒有畫面
 @app.route('/logout', methods=['GET'], strict_slashes=False)

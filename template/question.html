@@ -19,20 +19,20 @@
         <hr class="hr-line">
         <div class='question-system'>
 
-            {% for number in open_questions %} 
+            {% for num in opened_questions %} 
             <div class='question-item' tabindex='0'>
-                <div class="state {% if open_questions[number]['result'] == 2 %}
+                <div class="state {% if opened_questions[num]['light'] == 2 %}
                 not-answered
-                {% elif open_questions[number]['result'] == 1 %}
+                {% elif opened_questions[num]['light'] == 1 %}
                 passed
-                {% elif open_questions[number]['result'] == 0 %}
+                {% elif opened_questions[num]['light'] == 0 %}
                 not-passed
-                {% endif %}">{{  number  }}</div>
+                {% endif %}">{{  num  }}</div>
                 <div class='question-info'>
-                    <h4 class='question-title'><a href="/question/{{  number  }}">{{  open_questions[number]['title']  }}</a></h4>
-                    <p class='question-description'>{{  open_questions[number]['description']  }}</p>
+                    <h4 class='question-title'><a href="/question/{{  num  }}">{{  opened_questions[num]['title']  }}</a></h4>
+                    <p class='question-description'>{{  opened_questions[num]['description']  }}</p>
                     <div class='label-pool'>
-                        {% for tag in open_questions[number]['tag'] %} 
+                        {% for tag in opened_questions[num]['tag'] %} 
                         <label>{{  tag  }}</label>
                         {% endfor %}
                     </div>
@@ -49,20 +49,20 @@
         <hr class="hr-line">
         <div class='question-system'>
 
-            {% for number in close_questions %}
+            {% for num in closed_questions %}
             <div class='question-item' tabindex='0'>
-                <div class="state {% if close_questions[number]['result'] == 2 %}
+                <div class="state {% if closed_questions[num]['light'] == 2 %}
                 not-answered
-                {% elif close_questions[number]['result'] == 1 %}
+                {% elif closed_questions[num]['light'] == 1 %}
                 passed
-                {% elif close_questions[number]['result'] == 0 %}
+                {% elif closed_questions[num]['light'] == 0 %}
                 not-passed
-                {% endif %}">{{  number  }}</div>
+                {% endif %}">{{  num  }}</div>
                 <div class='question-info'>
-                    <h4 class='question-title'><a href="/question/{{  number  }}">{{  close_questions[number]['title']  }}</a></h4>
-                    <p class='question-description'>{{  close_questions[number]['description']  }}</p>
+                    <h4 class='question-title'><a href="/question/{{  num  }}">{{  closed_questions[num]['title']  }}</a></h4>
+                    <p class='question-description'>{{  closed_questions[num]['description']  }}</p>
                     <div class='label-pool'>
-                        {% for tag in close_questions[number]['tag'] %} 
+                        {% for tag in closed_questions[num]['tag'] %} 
                         <label>{{  tag  }}</label>
                         {% endfor %}
                     </div>
