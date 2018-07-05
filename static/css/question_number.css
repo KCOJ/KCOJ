@@ -82,7 +82,7 @@ pre.content {
 /* 放上程式碼的地方 */
 textarea.coding-area {
     width: 100%;
-    font-family: 'Consolas';
+    font-family: 'Consolas', 'Menlo';
     border: 2px solid black;
     border-radius: 8px;
     padding: 8px;
