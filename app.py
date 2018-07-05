@@ -238,9 +238,21 @@ def question_page():
         if not num in api_question:
             continue
         # 新增外部資訊
-        questions[num]['title'] = ext_questions[num]['title']
-        questions[num]['description'] = ext_questions[num]['description']
-        questions[num]['tag'] = ext_questions[num]['tag']
+        try:
+            questions[num]['title'] = ext_questions[num]['title']
+        except KeyError:
+            pass
+
+        try:
+            questions[num]['description'] = ext_questions[num]['description']
+        except KeyError:
+            pass
+
+        try:
+            questions[num]['tag'] = ext_questions[num]['tag']
+        except KeyError:
+            pass
+
 
     closed = {}
     opened = {}
