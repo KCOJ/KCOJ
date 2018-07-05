@@ -80,6 +80,9 @@ pre.content {
 }
 
 /* 放上程式碼的地方 */
+form.coding-form {
+    width: 100%;
+}
 textarea.coding-area {
     width: 100%;
     font-family: 'Consolas', 'Menlo';

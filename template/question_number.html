@@ -45,11 +45,13 @@
         <hr>
 
         <!-- 程式碼輸入區 -->
-        <label for="txaCode">程式碼：</label>
-        <textarea name="code" id="txaCode" cols="30" rows="10" class="coding-area"></textarea>
-        <div class="action-bar">
-            <button class="btn btn-primary">送出答案</button>
-        </div>
+        <form action="/question/{{  question_number  }}" method="POST" class="coding-form">
+            <label for="txaCode">程式碼：</label>
+            <textarea name="code" id="txaCode" cols="30" rows="10" class="coding-area"></textarea>
+            <div class="action-bar">
+                <button type="submit" class="btn btn-primary">送出答案</button>
+            </div>
+        </form>
     </div>
 </main>
 {% endblock %}
