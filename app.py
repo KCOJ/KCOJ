@@ -23,7 +23,7 @@ login_manager = LoginManager(app)
 
 # 寫死的題目標題、敘述、標籤
 try:
-    f = open(sys.path[0] + 'questions.json', 'r')
+    f = open(sys.path[0] + '/questions.json', 'r')
     ext_questions = json.load(f)
     f.close()
 except FileNotFoundError:
