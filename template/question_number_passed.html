@@ -48,7 +48,7 @@
                 </thead>
                 <tbody>
                     {% for passer in passers %}
-                        <tr><th scope="row"><a href="/user?userid={{ passer }}">{{ passer }}</a></th></tr>
+                    <tr><th scope="row"><img src="{{ passers[passer] }}" alt="passer_gravatar"> <a href="/user?userid={{  passer }}">{{ passer }}</a></th></tr>
                     {% endfor %}
                 </tbody>
             </table>

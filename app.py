@@ -530,6 +530,17 @@ def question_number_passed_page(number):
 
     content = users[useruid]['api'].show_question(number)
 
+
+    passers_info = {}
+    passers = users[useruid]['api'].list_passers(number)
+    for passer in passers:
+        try:
+            passer_email = users[passer + users[useruid]['course']]['email']
+        except KeyError:
+            passer_email = ''
+
+        passers_info[passer] = get_gravatar(passer_email, 25)
+
     return render_template('question_number_passed.html',
                            title=("KCOJ - " + users[useruid]['course'] + " " + number),
                            userid=userid,
@@ -539,7 +550,7 @@ def question_number_passed_page(number):
                            question_content=content,
                            question_cases=test_cases,
                            question_light=question['light'],
-                           passers=users[useruid]['api'].list_passers(number))
+                           passers=passers_info)
 
 # 登出沒有畫面
 @app.route('/logout', methods=['GET'], strict_slashes=False)
