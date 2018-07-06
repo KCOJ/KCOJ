@@ -171,7 +171,7 @@ def user_page():
         email = request.form['email']
         # 登入交作業網站
         api = KCOJ(URL)
-        api.login(userid, old_passwd, users[useruid]['course'])
+        api.login(userid, old_passwd, api.get_courses().index(users[useruid]['course']) + 1)
         # 確認是否登入成功
         if api.check_online():
             # 如果要變更密碼
