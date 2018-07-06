@@ -23,7 +23,7 @@ login_manager = LoginManager(app)
 
 # 寫死的題目標題、敘述、標籤
 try:
-    f = open('questions.json', 'r')
+    f = open(sys.path[0] + 'questions.json', 'r')
     ext_questions = json.load(f)
     f.close()
 except FileNotFoundError:
@@ -368,7 +368,7 @@ def question_number_page(number):
         # 取得使用者程式碼
         code = request.form['code']
         # 定義檔名
-        filename = sys.path[0] + '/' + userid + number
+        filename = userid + number
         # 定義副檔名
         language = users[useruid]['api'].list_questions()[number][3]
         if language == 'Python':
@@ -380,7 +380,7 @@ def question_number_page(number):
         else:
             filename += '.c'
         # 把程式碼儲存成文字檔
-        with open(filename, 'w') as f:
+        with open(sys.path[0] + '/' + filename, 'w') as f:
             f.write(code)
         # 刪除原本的程式碼
         users[useruid]['api'].delete_answer(number)
