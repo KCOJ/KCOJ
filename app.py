@@ -4,6 +4,7 @@ from KCOJ_api.kcoj import KCOJ
 
 from flask import Flask, request, url_for, redirect, Response, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+import os
 import sys
 import json
 import time
@@ -301,11 +302,11 @@ def question_number_page(number):
     if not keep_login():
         logout_user()
 
-    if request.method == 'GET':
-        # 使用者的 ID
-        useruid = current_user.get_id()
-        userid = users[useruid]['userid']
+    # 使用者的 ID
+    useruid = current_user.get_id()
+    userid = users[useruid]['userid']
 
+    if request.method == 'GET':
         # 顯示題目列表
         questions = {}
 
@@ -364,8 +365,37 @@ def question_number_page(number):
                                question_light=question['light'])
 
     if request.method == 'POST':
-        # TODO: 提交程式碼內容到作業網站。
-        return "POST /question/" + number
+        # 取得使用者程式碼
+        code = request.form['code']
+        # 定義檔名
+        filename = sys.path[0] + '/' + userid + number
+        # 定義副檔名
+        language = users[useruid]['api'].list_questions()[number][3]
+        if language == 'Python':
+            filename += '.py'
+        elif language == 'Java':
+            filename += '.java'
+        elif language == 'C#':
+            filename += '.cs'
+        else:
+            filename += '.c'
+        # 把程式碼儲存成文字檔
+        with open(filename, 'w') as f:
+            f.write(code)
+        # 刪除原本的程式碼
+        users[useruid]['api'].delete_answer(number)
+        # 上傳並判斷是否成功
+        if users[useruid]['api'].upload_answer(number, filename):
+            # 上傳成功
+            pass
+        else:
+            # 上傳失敗
+            pass
+
+        # 移除上傳的檔案
+        os.remove(filename)
+        # 回到題目頁
+        return redirect('/question/' + number)
 
 # 作業討論畫面
 @app.route('/question/<number>/forum', methods=['GET', 'POST'], strict_slashes=False)
