@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
-from KCOJ_api.kcoj import KCOJ
-
-from flask import Flask, request, url_for, redirect, Response, render_template
-from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import os
 import sys
 import json
 import time
 import hashlib
 import threading
+from flask import Flask, request, url_for, redirect, Response, render_template
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+from KCOJ_api import KCOJ
 
 URL = "https://140.124.184.228/Exam/"
 

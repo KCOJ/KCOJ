@@ -2,3 +2,4 @@ requests
 bs4
 flask
 flask-login
+KCOJ-api==1.0
