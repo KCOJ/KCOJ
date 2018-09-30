@@ -10,7 +10,7 @@ from flask import Flask, request, url_for, redirect, Response, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
 
-URL = "https://140.124.184.228/Exam/"
+URL = "https://140.124.184.228/upload/"
 
 # 初始化 Flask
 app = Flask(__name__, instance_relative_config=True, template_folder='template')
