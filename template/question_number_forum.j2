@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% include 'base.j2' %}
 {% block body %}
-<link rel="stylesheet" type="text/css" href="/static/css/question_number.css">
+<link rel="stylesheet" type="text/css" href="/static/css/question_number_forum.css">
 <!-- 主要版面 -->
 <main class='container'>
     <div class="row">
@@ -30,28 +30,34 @@
         <!-- 分頁標籤 -->
         <ul class="nav nav-tabs page-tab">
             <li class="nav-item">
-                <a class="nav-link active">題目內容</a>
+                <a class="nav-link" href="/question/{{ question_number }}/content">題目內容</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/question/{{ question_number }}/forum">討論區</a>
+                <a class="nav-link active">討論區</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/question/{{ question_number }}/passed">通過者名單</a>
             </li>
         </ul>
 
-        <!-- 題目內容 -->
-        <pre class="content">{{ question_content }}</pre>
-        <hr>
-
-        <!-- 程式碼輸入區 -->
-        <form action="/question/{{  question_number  }}" method="POST" class="coding-form">
-            <label for="txaCode">程式碼：</label>
-            <textarea name="code" id="txaCode" cols="30" rows="10" class="coding-area"></textarea>
-            <div class="action-bar">
-                <button type="submit" class="btn btn-primary">送出答案</button>
-            </div>
+        <!-- 使用者填寫留言區 -->
+        <h4 class="your-comment">你的留言：</h4>
+        <form class="user-comment-area">
+            <textarea class="form-control txaComment" placeholder="請輸入您的留言..."></textarea>
+            <button class="btn btn-block btn-primary">提交</button>
         </form>
+        <hr>
+        
+        <!-- 留言區 -->
+        <div class="comment-area">
+            {% for comment in comments %}
+                <div class="comment-item">
+                    <h5>{{ comment.name }}：</h5>
+                    <p>{{ comment.content }}</p>
+                    <small class="comment-time">{{ comment.time }}</small>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </main>
 {% endblock %}

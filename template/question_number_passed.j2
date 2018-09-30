@@ -1,6 +1,6 @@
-{% include 'base.html' %}
+{% include 'base.j2' %}
 {% block body %}
-<link rel="stylesheet" type="text/css" href="/static/css/question_number_forum.css">
+<link rel="stylesheet" type="text/css" href="/static/css/question_number_passed.css">
 <!-- 主要版面 -->
 <main class='container'>
     <div class="row">
@@ -19,9 +19,9 @@
         <!-- 測資結果 -->
         <ul class="test-case-list">
             {% for case in question_cases %}
-                {% if case[0] == True %}
+                {% if case[0] == 1 %}
                     <li class="case-item passed"> {{  case[1]  }} <span class="case-msg">{{ case[2] }}</span></li>
-                {% else %}
+                {% elif case[0] == 0 %}
                     <li class="case-item not-passed"> {{  case[1]  }} <span class="case-msg">{{ case[2] }}</span></li>
                 {% endif %}
             {% endfor %}
@@ -33,31 +33,27 @@
                 <a class="nav-link" href="/question/{{ question_number }}/content">題目內容</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active">討論區</a>
+                <a class="nav-link" href="/question/{{ question_number }}/forum">討論區</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/question/{{ question_number }}/passed">通過者名單</a>
+                <a class="nav-link active">通過者名單</a>
             </li>
         </ul>
 
-        <!-- 使用者填寫留言區 -->
-        <h4 class="your-comment">你的留言：</h4>
-        <form class="user-comment-area">
-            <textarea class="form-control txaComment" placeholder="請輸入您的留言..."></textarea>
-            <button class="btn btn-block btn-primary">提交</button>
-        </form>
-        <hr>
-        
-        <!-- 留言區 -->
-        <div class="comment-area">
-            {% for comment in comments %}
-                <div class="comment-item">
-                    <h5>{{ comment.name }}：</h5>
-                    <p>{{ comment.content }}</p>
-                    <small class="comment-time">{{ comment.time }}</small>
-                </div>
-            {% endfor %}
+        <!-- 通過者清單 -->
+        <div class="col-xl-6 offset-xl-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1">
+            <table class="table table-sm border shadow text-center">
+                <thead>
+                    <tr class='table-info border'><th scope="col">學號</th></tr>
+                </thead>
+                <tbody>
+                    {% for passer in passers %}
+                    <tr><th scope="row"><img src="{{ passers[passer] }}" alt="passer_gravatar"> <a href="/user?userid={{  passer }}">{{ passer }}</a></th></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+
     </div>
 </main>
 {% endblock %}

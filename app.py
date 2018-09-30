@@ -73,7 +73,7 @@ def index_page():
 
     useruid = current_user.get_id()
     # 顯示主畫面
-    return render_template('index.html',
+    return render_template('index.j2',
                            title="KCOJ - 首頁",
                            userid=users[useruid]['userid'],
                            gravatar=get_gravatar(users[useruid]['email'], 30),
@@ -92,7 +92,7 @@ def login_page():
 
     if request.method == 'GET':
         # 顯示登入畫面
-        return render_template('login.html', title="KCOJ - 登入", courses=api.get_courses())
+        return render_template('login.j2', title="KCOJ - 登入", courses=api.get_courses())
 
     if request.method == 'POST':
         # 取得登入資訊
@@ -120,7 +120,7 @@ def login_page():
             return redirect('/')
         else:
             # 顯示登入畫面含錯誤訊息
-            return render_template('login.html',
+            return render_template('login.j2',
                                    title="KCOJ - 登入",
                                    courses=api.get_courses(),
                                    error_message="登入失敗，請檢查輸入的資訊是否有誤！")
@@ -152,7 +152,7 @@ def user_page():
             else:
                 view_email = ''
 
-        return render_template('user.html',
+        return render_template('user.j2',
                                title=("KCOJ - " + view_userid),
                                userid=userid, 
                                gravatar=get_gravatar(users[useruid]['email'], 30),
@@ -196,7 +196,7 @@ def docs_page():
     useruid = current_user.get_id()
     userid = users[useruid]['userid']
 
-    return render_template('docs.html',
+    return render_template('docs.j2',
                            title="KCOJ - 程式技巧",
                            userid=userid, 
                            gravatar=get_gravatar(users[useruid]['email'], 30))
@@ -284,7 +284,7 @@ def question_page():
                 # 題目燈號為已／未繳交
                 opened[num]['light'] = 0 if False in results else 1
 
-    return render_template('question.html',
+    return render_template('question.j2',
                            title="KCOJ - " + users[useruid]['course'] + " 題庫",
                            userid=userid,
                            gravatar=get_gravatar(users[useruid]['email'], 30),
@@ -353,7 +353,7 @@ def question_number_page(number):
 
         content = users[useruid]['api'].show_question(number)
 
-        return render_template('question_number.html',
+        return render_template('question_number.j2',
                                title=("KCOJ - " + users[useruid]['course'] + " " + number),
                                userid=userid,
                                gravatar=get_gravatar(users[useruid]['email'], 30),
@@ -456,7 +456,7 @@ def question_number_forum_page(number):
 
         content = users[useruid]['api'].show_question(number)
 
-        return render_template('question_number_forum.html',
+        return render_template('question_number_forum.j2',
                                title=("KCOJ - " + users[useruid]['course'] + " " + number),
                                userid=userid,
                                gravatar=get_gravatar(users[useruid]['email'], 30),
@@ -540,7 +540,7 @@ def question_number_passed_page(number):
 
         passers_info[passer] = get_gravatar(passer_email, 25)
 
-    return render_template('question_number_passed.html',
+    return render_template('question_number_passed.j2',
                            title=("KCOJ - " + users[useruid]['course'] + " " + number),
                            userid=userid,
                            gravatar=get_gravatar(users[useruid]['email'], 30),

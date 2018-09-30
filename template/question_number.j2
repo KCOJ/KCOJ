@@ -1,6 +1,6 @@
-{% include 'base.html' %}
+{% extends "base.j2" %}
 {% block body %}
-<link rel="stylesheet" type="text/css" href="/static/css/question_number_passed.css">
+<link rel="stylesheet" type="text/css" href="/static/css/question_number.css">
 <!-- 主要版面 -->
 <main class='container'>
     <div class="row">
@@ -19,9 +19,9 @@
         <!-- 測資結果 -->
         <ul class="test-case-list">
             {% for case in question_cases %}
-                {% if case[0] == 1 %}
+                {% if case[0] == True %}
                     <li class="case-item passed"> {{  case[1]  }} <span class="case-msg">{{ case[2] }}</span></li>
-                {% elif case[0] == 0 %}
+                {% else %}
                     <li class="case-item not-passed"> {{  case[1]  }} <span class="case-msg">{{ case[2] }}</span></li>
                 {% endif %}
             {% endfor %}
@@ -30,30 +30,28 @@
         <!-- 分頁標籤 -->
         <ul class="nav nav-tabs page-tab">
             <li class="nav-item">
-                <a class="nav-link" href="/question/{{ question_number }}/content">題目內容</a>
+                <a class="nav-link active">題目內容</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/question/{{ question_number }}/forum">討論區</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active">通過者名單</a>
+                <a class="nav-link" href="/question/{{ question_number }}/passed">通過者名單</a>
             </li>
         </ul>
 
-        <!-- 通過者清單 -->
-        <div class="col-xl-6 offset-xl-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1">
-            <table class="table table-sm border shadow text-center">
-                <thead>
-                    <tr class='table-info border'><th scope="col">學號</th></tr>
-                </thead>
-                <tbody>
-                    {% for passer in passers %}
-                    <tr><th scope="row"><img src="{{ passers[passer] }}" alt="passer_gravatar"> <a href="/user?userid={{  passer }}">{{ passer }}</a></th></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        <!-- 題目內容 -->
+        <pre class="content">{{ question_content }}</pre>
+        <hr>
 
+        <!-- 程式碼輸入區 -->
+        <form action="/question/{{  question_number  }}" method="POST" class="coding-form">
+            <label for="txaCode">程式碼：</label>
+            <textarea name="code" id="txaCode" cols="30" rows="10" class="coding-area"></textarea>
+            <div class="action-bar">
+                <button type="submit" class="btn btn-primary">送出答案</button>
+            </div>
+        </form>
     </div>
 </main>
 {% endblock %}
