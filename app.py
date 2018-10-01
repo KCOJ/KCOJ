@@ -13,7 +13,9 @@ from KCOJ_api import KCOJ
 URL = "https://140.124.184.228/upload/"
 
 # 初始化 Flask
-app = Flask(__name__, instance_relative_config=True, template_folder='template')
+app = Flask(__name__,
+            instance_relative_config=True,
+            template_folder='template')
 app.config.from_object('config')
 app.config.from_pyfile('config.py')
 
@@ -29,44 +31,57 @@ except FileNotFoundError:
     ext_questions = {}
 
 # 儲存使用者資訊
-users = {}  
+users = {}
 
-class User(UserMixin):      
+
+class User(UserMixin):
     def __init__(self, userid):
         super()
         self.id = userid
 
+
 @login_manager.user_loader
 def user_loader(userid):
-    if userid in users:    
+    if userid in users:
         return User(userid)
     else:
         return None
 
-# 試著保持著登入狀態
+
 def keep_login():
+    """
+    試著保持著登入狀態
+    """
     useruid = current_user.get_id()
     # 確認是否是登入狀態
     if users[useruid]['api'].check_online():
         return True
-    # 如果不是登入狀態就嘗試登入
+    # 嘗試登入
     try:
-        users[useruid]['api'].login(users[useruid]['userid'], 
-                                    users[useruid]['passwd'], 
+        users[useruid]['api'].login(users[useruid]['userid'],
+                                    users[useruid]['passwd'],
                                     KCOJ(URL).get_courses().index(users[useruid]['course']) + 1)
     except IndexError:
         return False
-    # 回傳登入狀態
+    # 回傳狀態
     return users[useruid]['api'].check_online()
 
-# 取得 Gravatar 上的大頭貼
-def get_gravatar(email, size):
-    return 'https://s.gravatar.com/avatar/' + hashlib.md5(bytes(email, 'utf-8')).hexdigest() + '?size=' + str(size)
 
-# 主畫面
+def get_gravatar(email, size):
+    """
+    取得 Gravatar 上的大頭貼
+    """
+    url = 'https://s.gravatar.com/avatar/{PROFILE}?size={SIZE}'.format(
+        PROFILE=hashlib.md5(bytes(email, 'utf-8')).hexdigest(), SIZE=str(size))
+    return url
+
+
 @app.route('/', methods=['GET'], strict_slashes=False)
 @login_required
 def index_page():
+    """
+    主畫面
+    """
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
@@ -79,20 +94,28 @@ def index_page():
                            gravatar=get_gravatar(users[useruid]['email'], 30),
                            notices=users[useruid]['api'].get_notices())
 
-# 登入失敗回到登入畫面
+
 @login_manager.unauthorized_handler
 def login_failed_page():
+    """
+    登入失敗轉址回登入畫面
+    """
     return redirect('/login')
 
-# 登入畫面
+
 @app.route('/login', methods=['GET', 'POST'], strict_slashes=False)
 def login_page():
+    """
+    登入畫面
+    """
     # 使用 API
     api = KCOJ(URL)
 
     if request.method == 'GET':
         # 顯示登入畫面
-        return render_template('login.j2', title="KCOJ - 登入", courses=api.get_courses())
+        return render_template('login.j2',
+                               title="KCOJ - 登入",
+                               courses=api.get_courses())
 
     if request.method == 'POST':
         # 取得登入資訊
@@ -125,10 +148,13 @@ def login_page():
                                    courses=api.get_courses(),
                                    error_message="登入失敗，請檢查輸入的資訊是否有誤！")
 
-# 個人資料畫面
+
 @app.route('/user', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def user_page():
+    """
+    個人資料畫面
+    """
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
@@ -154,8 +180,9 @@ def user_page():
 
         return render_template('user.j2',
                                title=("KCOJ - " + view_userid),
-                               userid=userid, 
-                               gravatar=get_gravatar(users[useruid]['email'], 30),
+                               userid=userid,
+                               gravatar=get_gravatar(
+                                   users[useruid]['email'], 30),
                                view_userid=view_userid,
                                view_email=view_email,
                                view_gravatar=get_gravatar(view_email, 200),
@@ -171,7 +198,8 @@ def user_page():
         email = request.form['email']
         # 登入交作業網站
         api = KCOJ(URL)
-        api.login(userid, old_passwd, api.get_courses().index(users[useruid]['course']) + 1)
+        api.login(userid, old_passwd, api.get_courses().index(
+            users[useruid]['course']) + 1)
         # 確認是否登入成功
         if api.check_online():
             # 如果要變更密碼
@@ -181,13 +209,16 @@ def user_page():
             # 如果要變更 Email
             if email != '':
                 users[useruid]['email'] = email
-                
+
         return redirect('/user')
 
-# 技巧文庫畫面
+
 @app.route('/docs', methods=['GET'], strict_slashes=False)
 @login_required
 def docs_page():
+    """
+    技巧文庫畫面
+    """
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
@@ -198,13 +229,16 @@ def docs_page():
 
     return render_template('docs.j2',
                            title="KCOJ - 程式技巧",
-                           userid=userid, 
+                           userid=userid,
                            gravatar=get_gravatar(users[useruid]['email'], 30))
 
-# 作業題庫畫面
+
 @app.route('/question', methods=['GET'], strict_slashes=False)
 @login_required
 def question_page():
+    """
+    作業題庫畫面
+    """
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
@@ -231,7 +265,7 @@ def question_page():
             'language': api_question[num][3],
             'results': users[useruid]['api'].list_results(num, userid),
         }
-    
+
     # 抓外部寫死的題目資訊
     for num in ext_questions:
         # 如果 API 沒有這題就跳過
@@ -252,7 +286,6 @@ def question_page():
             questions[num]['tag'] = ext_questions[num]['tag']
         except KeyError:
             pass
-
 
     closed = {}
     opened = {}
@@ -292,11 +325,14 @@ def question_page():
                            opened_questions=opened,
                            closed_questions=closed)
 
-# 作業題目畫面
+
 @app.route('/question/<number>/content', methods=['GET', 'POST'], strict_slashes=False)
 @app.route('/question/<number>', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def question_number_page(number):
+    """
+    作業題目畫面
+    """
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
@@ -333,10 +369,10 @@ def question_number_page(number):
             questions[num]['title'] = ext_questions[num]['title']
             questions[num]['description'] = ext_questions[num]['description']
             questions[num]['tag'] = ext_questions[num]['tag']
-    
+
         # 選擇特定的題目
         question = questions[number]
-        
+
         if len(question['results']) == 0:
             # 題目燈號為未繳交
             question['light'] = 2
@@ -349,14 +385,16 @@ def question_number_page(number):
 
         test_cases = []
         for result in question['results']:
-           test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
+            test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
         content = users[useruid]['api'].show_question(number)
 
         return render_template('question_number.j2',
-                               title=("KCOJ - " + users[useruid]['course'] + " " + number),
+                               title=("KCOJ - " +
+                                      users[useruid]['course'] + " " + number),
                                userid=userid,
-                               gravatar=get_gravatar(users[useruid]['email'], 30),
+                               gravatar=get_gravatar(
+                                   users[useruid]['email'], 30),
                                question_number=number,
                                question_title=question['title'],
                                question_content=content,
@@ -368,15 +406,14 @@ def question_number_page(number):
         code = request.form['code']
         # 定義檔名
         filename = userid + number
-        # 定義副檔名
         language = users[useruid]['api'].list_questions()[number][3]
         if language == 'Python':
             filename += '.py'
-        elif language == 'Java':
+        if language == 'Java':
             filename += '.java'
-        elif language == 'C#':
+        if language == 'C#':
             filename += '.cs'
-        else:
+        if language == 'C':
             filename += '.c'
         # 把程式碼儲存成文字檔
         with open(sys.path[0] + '/' + filename, 'w') as f:
@@ -396,10 +433,13 @@ def question_number_page(number):
         # 回到題目頁
         return redirect('/question/' + number)
 
-# 作業討論畫面
+
 @app.route('/question/<number>/forum', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def question_number_forum_page(number):
+    """
+    作業討論畫面
+    """
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
@@ -436,10 +476,10 @@ def question_number_forum_page(number):
             questions[num]['title'] = ext_questions[num]['title']
             questions[num]['description'] = ext_questions[num]['description']
             questions[num]['tag'] = ext_questions[num]['tag']
-    
+
         # 選擇特定的題目
         question = questions[number]
-        
+
         if len(question['results']) == 0:
             # 題目燈號為未繳交
             question['light'] = 2
@@ -452,14 +492,16 @@ def question_number_forum_page(number):
 
         test_cases = []
         for result in question['results']:
-           test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
+            test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
         content = users[useruid]['api'].show_question(number)
 
         return render_template('question_number_forum.j2',
-                               title=("KCOJ - " + users[useruid]['course'] + " " + number),
+                               title=("KCOJ - " +
+                                      users[useruid]['course'] + " " + number),
                                userid=userid,
-                               gravatar=get_gravatar(users[useruid]['email'], 30),
+                               gravatar=get_gravatar(
+                                   users[useruid]['email'], 30),
                                question_number=number,
                                question_title=question['title'],
                                question_content=content,
@@ -470,10 +512,13 @@ def question_number_forum_page(number):
         # TODO: 新增討論文章。
         return "POST /question/" + number + "chat"
 
-# 作業通過畫面
+
 @app.route('/question/<number>/passed', methods=['GET'], strict_slashes=False)
 @login_required
 def question_number_passed_page(number):
+    """
+    作業通過畫面
+    """
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
@@ -509,10 +554,10 @@ def question_number_passed_page(number):
         questions[num]['title'] = ext_questions[num]['title']
         questions[num]['description'] = ext_questions[num]['description']
         questions[num]['tag'] = ext_questions[num]['tag']
-    
+
     # 選擇特定的題目
     question = questions[number]
-        
+
     if len(question['results']) == 0:
         # 題目燈號為未繳交
         question['light'] = 2
@@ -525,10 +570,9 @@ def question_number_passed_page(number):
 
     test_cases = []
     for result in question['results']:
-       test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
+        test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
     content = users[useruid]['api'].show_question(number)
-
 
     passers_info = {}
     passers = users[useruid]['api'].list_passers(number)
@@ -541,7 +585,8 @@ def question_number_passed_page(number):
         passers_info[passer] = get_gravatar(passer_email, 25)
 
     return render_template('question_number_passed.j2',
-                           title=("KCOJ - " + users[useruid]['course'] + " " + number),
+                           title=("KCOJ - " + users[useruid]
+                                  ['course'] + " " + number),
                            userid=userid,
                            gravatar=get_gravatar(users[useruid]['email'], 30),
                            question_number=number,
@@ -551,15 +596,21 @@ def question_number_passed_page(number):
                            question_light=question['light'],
                            passers=passers_info)
 
-# 登出沒有畫面
+
 @app.route('/logout', methods=['GET'], strict_slashes=False)
 @login_required
 def logout_nopage():
+    """
+    登出系統
+    """
     logout_user()
     return redirect('/login')
 
-# 將 JSON 檔還原使用者資料
+
 def restore_db():
+    """
+    將 JSON 檔還原使用者資料
+    """
     try:
         with open(sys.path[0] + '/users.json', 'r') as f:
             users_restore = json.load(f)
@@ -576,8 +627,11 @@ def restore_db():
         with open(sys.path[0] + '/users.json', 'w') as f:
             f.write("{}")
 
-# 備份使用者資料到 JSON 檔
+
 def backup_db():
+    """
+    備份使用者資料到 JSON 檔
+    """
     users_backup = {}
     for key in users.keys():
         user = users[key]
@@ -589,7 +643,8 @@ def backup_db():
         }
     with open(sys.path[0] + '/users.json', 'w') as f:
         json.dump(users_backup, f, indent='  ')
-	
+
+
 class BackupThread(threading.Thread):
     def run(self):
         while True:
@@ -598,6 +653,7 @@ class BackupThread(threading.Thread):
             # 延遲 10 秒
             time.sleep(10)
 
+
 def main():
     # 還原資料
     restore_db()
@@ -605,6 +661,7 @@ def main():
     BackupThread().start()
     # 開啟伺服器
     app.run(port=11711, threaded=True)
+
 
 if __name__ == '__main__':
     main()
