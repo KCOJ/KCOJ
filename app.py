@@ -6,6 +6,7 @@ import json
 import time
 import hashlib
 import threading
+
 from flask import Flask, request, url_for, redirect, Response, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
@@ -14,23 +15,12 @@ URL = "https://140.124.184.228/upload/"
 
 # 初始化 Flask
 app = Flask(__name__,
-            instance_relative_config=True,
-            template_folder='template')
+            template_folder='template',
+            instance_relative_config=True)
 app.config.from_pyfile('config.py')
 
 # 初始化 Flask 登入管理員
 login_manager = LoginManager(app)
-
-# 寫死的題目標題、敘述、標籤
-try:
-    f = open(sys.path[0] + '/questions.json', 'r')
-    ext_questions = json.load(f)
-    f.close()
-except FileNotFoundError:
-    ext_questions = {}
-
-# 儲存使用者資訊
-users = {}
 
 
 class User(UserMixin):
@@ -45,6 +35,18 @@ def user_loader(userid):
         return User(userid)
     else:
         return None
+
+
+# 寫死的題目標題、敘述、標籤
+try:
+    f = open(sys.path[0] + '/questions.json', 'r')
+    ext_questions = json.load(f)
+    f.close()
+except FileNotFoundError:
+    ext_questions = {}
+
+# 儲存使用者資訊
+users = {}
 
 
 def keep_login():
