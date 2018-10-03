@@ -55,17 +55,17 @@ def keep_login():
     """
     useruid = current_user.get_id()
     # 確認是否是登入狀態
-    if users[useruid]['api'].check_online():
+    if users[useruid]['api'].active:
         return True
     # 嘗試登入
     try:
         users[useruid]['api'].login(users[useruid]['userid'],
                                     users[useruid]['passwd'],
-                                    KCOJ(URL).get_courses().index(users[useruid]['course']) + 1)
+                                    KCOJ(URL).courses.index(users[useruid]['course']) + 1)
     except IndexError:
         return False
     # 回傳狀態
-    return users[useruid]['api'].check_online()
+    return users[useruid]['api'].active
 
 
 def get_gravatar(email, size):
@@ -116,7 +116,7 @@ def login_page():
         # 顯示登入畫面
         return render_template('login.j2',
                                title="KCOJ - 登入",
-                               courses=api.get_courses())
+                               courses=api.courses)
 
     if request.method == 'POST':
         # 取得登入資訊
@@ -125,9 +125,9 @@ def login_page():
         course = request.form['course']
         useruid = userid + course
         # 登入交作業網站
-        api.login(userid, passwd, api.get_courses().index(course) + 1)
+        api.login(userid, passwd, api.courses.index(course) + 1)
         # 確認是否登入成功
-        if api.check_online():
+        if api.active:
             # 登入成功
             login_user(User(useruid))
             # 將登入資訊儲存起來
@@ -146,7 +146,7 @@ def login_page():
             # 顯示登入畫面含錯誤訊息
             return render_template('login.j2',
                                    title="KCOJ - 登入",
-                                   courses=api.get_courses(),
+                                   courses=api.courses,
                                    error_message="登入失敗，請檢查輸入的資訊是否有誤！")
 
 
@@ -199,13 +199,13 @@ def user_page():
         email = request.form['email']
         # 登入交作業網站
         api = KCOJ(URL)
-        api.login(userid, old_passwd, api.get_courses().index(
+        api.login(userid, old_passwd, api.courses.index(
             users[useruid]['course']) + 1)
         # 確認是否登入成功
-        if api.check_online():
+        if api.active:
             # 如果要變更密碼
             if new_passwd != '':
-                api.change_password(new_passwd)
+                api.update_password(new_passwd)
                 users[useruid]['passwd'] = new_passwd
             # 如果要變更 Email
             if email != '':
@@ -388,7 +388,7 @@ def question_number_page(number):
         for result in question['results']:
             test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-        content = users[useruid]['api'].show_question(number)
+        content = users[useruid]['api'].get_question_content(number)
 
         return render_template('question_number.j2',
                                title=("KCOJ - " +
@@ -420,9 +420,9 @@ def question_number_page(number):
         with open(sys.path[0] + '/' + filename, 'w') as f:
             f.write(code)
         # 刪除原本的程式碼
-        users[useruid]['api'].delete_answer(number)
+        users[useruid]['api'].delete_question_answer(number)
         # 上傳並判斷是否成功
-        if users[useruid]['api'].upload_answer(number, filename):
+        if users[useruid]['api'].post_question_answer(number, "Send from KCOJ", filename):
             # 上傳成功
             pass
         else:
@@ -495,7 +495,7 @@ def question_number_forum_page(number):
         for result in question['results']:
             test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-        content = users[useruid]['api'].show_question(number)
+        content = users[useruid]['api'].get_question_content(number)
 
         return render_template('question_number_forum.j2',
                                title=("KCOJ - " +
@@ -573,10 +573,10 @@ def question_number_passed_page(number):
     for result in question['results']:
         test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-    content = users[useruid]['api'].show_question(number)
+    content = users[useruid]['api'].get_question_content(number)
 
     passers_info = {}
-    passers = users[useruid]['api'].list_passers(number)
+    passers = users[useruid]['api'].get_question_passers(number)
     for passer in passers:
         try:
             passer_email = users[passer + users[useruid]['course']]['email']
