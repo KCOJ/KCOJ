@@ -241,8 +241,7 @@ def user_page():
         return render_template('user.j2',
                                title=("KCOJ - " + view_userid),
                                userid=userid,
-                               gravatar=get_gravatar(
-                                   users[useruid].email, 30),
+                               gravatar=get_gravatar(users[useruid].email, 30),
                                view_userid=view_userid,
                                view_email=view_email,
                                view_gravatar=get_gravatar(view_email, 200),
@@ -462,10 +461,10 @@ def question_number_page(number):
         users[useruid].api.delete_question_answer(number)
         # 上傳並判斷是否成功
         if users[useruid].api.post_question_answer(number, "Send from KCOJ", filename):
-            # 上傳成功
+            # TODO: 提示上傳成功
             pass
         else:
-            # 上傳失敗
+            # TODO: 提示上傳失敗
             pass
 
         # 移除上傳的檔案
