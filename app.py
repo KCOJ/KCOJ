@@ -13,7 +13,9 @@ from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
 
-URL = "https://140.124.184.228/upload/"
+# 讀取配置
+with open(sys.path[0] + '/config.json', 'r') as f:
+    config = json.load(f)
 
 # 產生 instance 的 key
 if not isdir(sys.path[0] + '/instance'):
@@ -71,7 +73,7 @@ def keep_login():
     try:
         users[useruid]['api'].login(users[useruid]['userid'],
                                     users[useruid]['passwd'],
-                                    KCOJ(URL).courses.index(users[useruid]['course']) + 1)
+                                    KCOJ(config['TARGET']['URL']).courses.index(users[useruid]['course']) + 1)
     except IndexError:
         return False
     # 回傳狀態
@@ -120,7 +122,7 @@ def login_page():
     登入畫面
     """
     # 使用 API
-    api = KCOJ(URL)
+    api = KCOJ(config['TARGET']['URL'])
 
     if request.method == 'GET':
         # 顯示登入畫面
@@ -208,7 +210,7 @@ def user_page():
         new_passwd = request.form['new_passwd']
         email = request.form['email']
         # 登入交作業網站
-        api = KCOJ(URL)
+        api = KCOJ(config['TARGET']['URL'])
         api.login(userid, old_passwd, api.courses.index(
             users[useruid]['course']) + 1)
         # 確認是否登入成功
@@ -632,7 +634,7 @@ def restore_db():
                     'passwd': user['passwd'],
                     'course': user['course'],
                     'email': user['email'],
-                    'api': KCOJ(URL),
+                    'api': KCOJ(config['TARGET']['URL']),
                 }
     except FileNotFoundError:
         with open(sys.path[0] + '/users.json', 'w') as f:
