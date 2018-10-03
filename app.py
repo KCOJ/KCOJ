@@ -7,7 +7,7 @@ import time
 import hashlib
 import threading
 
-from flask import Flask, request, url_for, redirect, Response, render_template
+from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
 
