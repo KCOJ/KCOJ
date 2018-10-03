@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from base64 import b64encode
+from os.path import isdir, isfile
 import os
 import sys
 import json
@@ -12,6 +14,14 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from KCOJ_api import KCOJ
 
 URL = "https://140.124.184.228/upload/"
+
+# 產生 instance 的 key
+if not isdir(sys.path[0] + '/instance'):
+    os.mkdir(sys.path[0] + '/instance')
+if not isfile(sys.path[0] + '/instance/config.py'):
+    with open(sys.path[0] + '/instance/config.py', 'w') as f:
+        f.write('SECRET_KEY = \'' +
+                b64encode(os.urandom(8)).decode('utf-8') + '\'')
 
 # 初始化 Flask
 app = Flask(__name__,
