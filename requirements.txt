@@ -2,4 +2,5 @@ requests
 bs4
 flask
 flask-login
+pymongo
 KCOJ-api

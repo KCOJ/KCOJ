@@ -11,6 +11,7 @@ import threading
 
 from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+from pymongo import MongoClient
 from KCOJ_api import KCOJ
 
 # 讀取配置
@@ -25,6 +26,9 @@ if not isfile(sys.path[0] + '/instance/config.py'):
         f.write('SECRET_KEY = \'' +
                 b64encode(os.urandom(8)).decode('utf-8') + '\'')
 
+# 初始化 MongoDB
+db = MongoClient().kcoj
+
 # 初始化 Flask
 app = Flask(__name__,
             template_folder='template',
@@ -35,10 +39,55 @@ app.config.from_pyfile('config.py')
 login_manager = LoginManager(app)
 
 
+# 儲存使用者資訊
+users = {}
+
+
 class User(UserMixin):
-    def __init__(self, userid):
+    def __init__(self, useruid):
         super()
-        self.id = userid
+        self.id = useruid
+        self.api = None
+
+    @property
+    def userid(self):
+        obj = db.users.find_one({'uid': self.id})
+        return obj and obj['userid']
+
+    @userid.setter
+    def userid(self, userid):
+        db.users.update({'uid': self.id}, {
+                        "$set": {"userid": userid}}, upsert=True)
+
+    @property
+    def passwd(self):
+        obj = db.users.find_one({'uid': self.id})
+        return obj and obj['passwd']
+
+    @passwd.setter
+    def passwd(self, passwd):
+        db.users.update({'uid': self.id}, {
+                        "$set": {"passwd": passwd}}, upsert=True)
+
+    @property
+    def course(self):
+        obj = db.users.find_one({'uid': self.id})
+        return obj and obj['course']
+
+    @course.setter
+    def course(self, course):
+        db.users.update({'uid': self.id}, {
+                        "$set": {"course": course}}, upsert=True)
+
+    @property
+    def email(self):
+        obj = db.users.find_one({'uid': self.id})
+        return obj and obj['email']
+
+    @email.setter
+    def email(self, email):
+        db.users.update({'uid': self.id}, {
+            "$set": {"email": email}}, upsert=True)
 
 
 @login_manager.user_loader
@@ -56,9 +105,6 @@ try:
     f.close()
 except FileNotFoundError:
     ext_questions = {}
-
-# 儲存使用者資訊
-users = {}
 
 
 def keep_login():
