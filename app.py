@@ -16,7 +16,6 @@ URL = "https://140.124.184.228/upload/"
 app = Flask(__name__,
             instance_relative_config=True,
             template_folder='template')
-app.config.from_object('config')
 app.config.from_pyfile('config.py')
 
 # 初始化 Flask 登入管理員
