@@ -273,26 +273,6 @@ def user_page():
         return redirect('/user')
 
 
-@app.route('/docs', methods=['GET'], strict_slashes=False)
-@login_required
-def docs_page():
-    """
-    技巧文庫畫面
-    """
-    # 嘗試保持登入狀態
-    if not keep_login():
-        logout_user()
-
-    # 使用者的 ID
-    useruid = current_user.get_id()
-    userid = users[useruid].userid
-
-    return render_template('docs.j2',
-                           title="KCOJ - 程式技巧",
-                           userid=userid,
-                           gravatar=get_gravatar(users[useruid].email, 30))
-
-
 @app.route('/question', methods=['GET'], strict_slashes=False)
 @login_required
 def question_page():
