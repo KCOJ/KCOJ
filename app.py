@@ -85,7 +85,7 @@ class User(UserMixin):
     @email.setter
     def email(self, email):
         db.users.update({'uid': self.id}, {
-            "$set": {"email": email}}, upsert=True)
+                        "$set": {"email": email}}, upsert=True)
 
 
 @login_manager.user_loader
