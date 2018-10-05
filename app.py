@@ -151,7 +151,8 @@ def index_page():
     return render_template('index.j2',
                            title="KCOJ - 首頁",
                            userid=users[useruid].userid,
-                           gravatar_image=get_gravatar(users[useruid].email, 30),
+                           profile_image=get_gravatar(
+                               users[useruid].email, 30),
                            notices=users[useruid].api.get_notices())
 
 
@@ -241,7 +242,8 @@ def user_page():
         return render_template('user.j2',
                                title=("KCOJ - " + view_userid),
                                userid=userid,
-                               gravatar_image=get_gravatar(users[useruid].email, 30),
+                               profile_image=get_gravatar(
+                                   users[useruid].email, 30),
                                view_userid=view_userid,
                                view_email=view_email,
                                view_gravatar=get_gravatar(view_email, 200),
@@ -359,7 +361,8 @@ def question_page():
     return render_template('question.j2',
                            title="KCOJ - " + users[useruid].course + " 題庫",
                            userid=userid,
-                           gravatar_image=get_gravatar(users[useruid].email, 30),
+                           profile_image=get_gravatar(
+                               users[useruid].email, 30),
                            course=users[useruid].course,
                            opened_questions=opened,
                            closed_questions=closed)
@@ -432,7 +435,7 @@ def question_number_page(number):
                                title=("KCOJ - " +
                                       users[useruid].course + " " + number),
                                userid=userid,
-                               gravatar_image=get_gravatar(
+                               profile_image=get_gravatar(
                                    users[useruid].email, 30),
                                question_number=number,
                                question_title=question['title'],
@@ -539,7 +542,7 @@ def question_number_forum_page(number):
                                title=("KCOJ - " +
                                       users[useruid].course + " " + number),
                                userid=userid,
-                               gravatar_image=get_gravatar(
+                               profile_image=get_gravatar(
                                    users[useruid].email, 30),
                                question_number=number,
                                question_title=question['title'],
@@ -627,7 +630,8 @@ def question_number_passed_page(number):
                            title=("KCOJ - " +
                                   users[useruid].course + " " + number),
                            userid=userid,
-                           gravatar_image=get_gravatar(users[useruid].email, 30),
+                           profile_image=get_gravatar(
+                               users[useruid].email, 30),
                            question_number=number,
                            question_title=question['title'],
                            question_content=content,
