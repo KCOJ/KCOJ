@@ -148,12 +148,12 @@ def index_page():
 
     useruid = current_user.get_id()
     # 顯示主畫面
-    return render_template('index.j2',
-                           title="KCOJ - 首頁",
-                           userid=users[useruid].userid,
-                           profile_image=get_gravatar(
-                               users[useruid].email, 30),
-                           notices=users[useruid].api.get_notices())
+    return render_template(
+        'index.j2',
+        title="KCOJ - 首頁",
+        userid=users[useruid].userid,
+        profile_image=get_gravatar(users[useruid].email, 30),
+        notices=users[useruid].api.get_notices())
 
 
 @login_manager.unauthorized_handler
@@ -174,9 +174,10 @@ def login_page():
 
     if request.method == 'GET':
         # 顯示登入畫面
-        return render_template('login.j2',
-                               title="KCOJ - 登入",
-                               courses=api.courses)
+        return render_template(
+            'login.j2',
+            title="KCOJ - 登入",
+            courses=api.courses)
 
     if request.method == 'POST':
         # 取得登入資訊
@@ -204,10 +205,11 @@ def login_page():
             return redirect('/')
         else:
             # 顯示登入畫面含錯誤訊息
-            return render_template('login.j2',
-                                   title="KCOJ - 登入",
-                                   courses=api.courses,
-                                   error_message="登入失敗，請檢查輸入的資訊是否有誤！")
+            return render_template(
+                'login.j2',
+                title="KCOJ - 登入",
+                courses=api.courses,
+                error_message="登入失敗，請檢查輸入的資訊是否有誤！")
 
 
 @app.route('/user', methods=['GET', 'POST'], strict_slashes=False)
@@ -239,15 +241,15 @@ def user_page():
             else:
                 view_email = ''
 
-        return render_template('user.j2',
-                               title=("KCOJ - " + view_userid),
-                               userid=userid,
-                               profile_image=get_gravatar(
-                                   users[useruid].email, 30),
-                               view_userid=view_userid,
-                               view_email=view_email,
-                               view_gravatar=get_gravatar(view_email, 200),
-                               no_me=(userid != view_userid))
+        return render_template(
+            'user.j2',
+            title=("KCOJ - " + view_userid),
+            userid=userid,
+            profile_image=get_gravatar(users[useruid].email, 30),
+            view_userid=view_userid,
+            view_email=view_email,
+            view_gravatar=get_gravatar(view_email, 200),
+            no_me=(userid != view_userid))
 
     if request.method == 'POST':
         # 使用者的 ID
@@ -358,14 +360,14 @@ def question_page():
                 # 題目燈號為已／未繳交
                 opened[num]['light'] = 0 if False in results else 1
 
-    return render_template('question.j2',
-                           title="KCOJ - " + users[useruid].course + " 題庫",
-                           userid=userid,
-                           profile_image=get_gravatar(
-                               users[useruid].email, 30),
-                           course=users[useruid].course,
-                           opened_questions=opened,
-                           closed_questions=closed)
+    return render_template(
+        'question.j2',
+        title="KCOJ - " + users[useruid].course + " 題庫",
+        userid=userid,
+        profile_image=get_gravatar(users[useruid].email, 30),
+        course=users[useruid].course,
+        opened_questions=opened,
+        closed_questions=closed)
 
 
 @app.route('/question/<number>/content', methods=['GET', 'POST'], strict_slashes=False)
@@ -431,17 +433,16 @@ def question_number_page(number):
 
         content = users[useruid].api.get_question_content(number)
 
-        return render_template('question_number.j2',
-                               title=("KCOJ - " +
-                                      users[useruid].course + " " + number),
-                               userid=userid,
-                               profile_image=get_gravatar(
-                                   users[useruid].email, 30),
-                               question_number=number,
-                               question_title=question['title'],
-                               question_content=content,
-                               question_cases=test_cases,
-                               question_light=question['light'])
+        return render_template(
+            'question_number.j2',
+            title=("KCOJ - " + users[useruid].course + " " + number),
+            userid=userid,
+            profile_image=get_gravatar(users[useruid].email, 30),
+            question_number=number,
+            question_title=question['title'],
+            question_content=content,
+            question_cases=test_cases,
+            question_light=question['light'])
 
     if request.method == 'POST':
         # 取得使用者程式碼
@@ -538,17 +539,16 @@ def question_number_forum_page(number):
 
         content = users[useruid].api.get_question_content(number)
 
-        return render_template('question_number_forum.j2',
-                               title=("KCOJ - " +
-                                      users[useruid].course + " " + number),
-                               userid=userid,
-                               profile_image=get_gravatar(
-                                   users[useruid].email, 30),
-                               question_number=number,
-                               question_title=question['title'],
-                               question_content=content,
-                               question_cases=test_cases,
-                               question_light=question['light'])
+        return render_template(
+            'question_number_forum.j2',
+            title=("KCOJ - " + users[useruid].course + " " + number),
+            userid=userid,
+            profile_image=get_gravatar(users[useruid].email, 30),
+            question_number=number,
+            question_title=question['title'],
+            question_content=content,
+            question_cases=test_cases,
+            question_light=question['light'])
 
     if request.method == 'POST':
         # TODO: 新增討論文章。
@@ -626,18 +626,17 @@ def question_number_passed_page(number):
 
         passers_info[passer] = get_gravatar(passer_email, 25)
 
-    return render_template('question_number_passed.j2',
-                           title=("KCOJ - " +
-                                  users[useruid].course + " " + number),
-                           userid=userid,
-                           profile_image=get_gravatar(
-                               users[useruid].email, 30),
-                           question_number=number,
-                           question_title=question['title'],
-                           question_content=content,
-                           question_cases=test_cases,
-                           question_light=question['light'],
-                           passers=passers_info)
+    return render_template(
+        'question_number_passed.j2',
+        title=("KCOJ - " + users[useruid].course + " " + number),
+        userid=userid,
+        profile_image=get_gravatar(users[useruid].email, 30),
+        question_number=number,
+        question_title=question['title'],
+        question_content=content,
+        question_cases=test_cases,
+        question_light=question['light'],
+        passers=passers_info)
 
 
 @app.route('/logout', methods=['GET'], strict_slashes=False)
