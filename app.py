@@ -109,6 +109,7 @@ def keep_login():
     """
     試著保持著登入狀態
     """
+    # 取得使用者 UID
     useruid = current_user.get_id()
     # 建立使用者物件
     users[useruid] = User(useruid)
@@ -131,9 +132,9 @@ def get_gravatar(email, size):
     """
     取得 Gravatar 上的大頭貼
     """
-    url = 'https://s.gravatar.com/avatar/{PROFILE}?size={SIZE}'.format(
+    # 直接回傳網址
+    return 'https://s.gravatar.com/avatar/{PROFILE}?size={SIZE}'.format(
         PROFILE=hashlib.md5(bytes(email, 'utf-8')).hexdigest(), SIZE=str(size))
-    return url
 
 
 @app.route('/', methods=['GET'], strict_slashes=False)
@@ -145,7 +146,7 @@ def index_page():
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
-
+    # 取得使用者 UID
     useruid = current_user.get_id()
     # 顯示主畫面
     return render_template(
@@ -221,17 +222,18 @@ def user_page():
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
+    # 取得使用者 UID
+    useruid = current_user.get_id()
+    # 取得使用者 ID
+    userid = users[useruid].userid
 
     if request.method == 'GET':
-        # 使用者的 ID
-        useruid = current_user.get_id()
-        userid = users[useruid].userid
-        # 要查看的使用者 ID
+        # 取得要查看的使用者 ID
         try:
             view_userid = request.args['userid']
         except KeyError:
             view_userid = userid
-        # 要查看的使用者 Email
+        # 取得要查看的使用者 Email
         try:
             view_email = users[view_userid + users[useruid].course].email
         except KeyError:
@@ -252,17 +254,14 @@ def user_page():
             no_me=(userid != view_userid))
 
     if request.method == 'POST':
-        # 使用者的 ID
-        useruid = current_user.get_id()
-        userid = users[useruid].userid
-        # 取得更新資訊
+        # 取得要更新的資訊
         old_passwd = request.form['old_passwd']
         new_passwd = request.form['new_passwd']
         email = request.form['email']
         # 登入交作業網站
         api = KCOJ(config['TARGET']['URL'])
-        api.login(userid, old_passwd, api.courses.index(
-            users[useruid].course) + 1)
+        api.login(userid, old_passwd,
+                  api.courses.index(users[useruid].course) + 1)
         # 確認是否登入成功
         if api.active:
             # 如果要變更密碼
@@ -285,9 +284,9 @@ def question_page():
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
-
-    # 使用者的 ID
+    # 取得使用者 UID
     useruid = current_user.get_id()
+    # 取得使用者 ID
     userid = users[useruid].userid
 
     # 顯示題目列表
@@ -380,9 +379,9 @@ def question_number_page(number):
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
-
-    # 使用者的 ID
+    # 取得使用者 UID
     useruid = current_user.get_id()
+    # 取得使用者 ID
     userid = users[useruid].userid
 
     if request.method == 'GET':
@@ -486,12 +485,12 @@ def question_number_forum_page(number):
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
+    # 取得使用者 UID
+    useruid = current_user.get_id()
+    # 取得使用者 ID
+    userid = users[useruid].userid
 
     if request.method == 'GET':
-        # 使用者的 ID
-        useruid = current_user.get_id()
-        userid = users[useruid].userid
-
         # 顯示題目列表
         questions = {}
 
@@ -564,9 +563,9 @@ def question_number_passed_page(number):
     # 嘗試保持登入狀態
     if not keep_login():
         logout_user()
-
-    # 使用者的 ID
+    # 取得使用者 UID
     useruid = current_user.get_id()
+    # 取得使用者 ID
     userid = users[useruid].userid
 
     # 顯示題目列表
