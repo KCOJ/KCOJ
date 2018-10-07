@@ -42,13 +42,13 @@ users = {}
 
 
 class User(UserMixin):
-    def __init__(self, useruid):
+    def __init__(self, useruid: str):
         super()
         self.id = useruid
         self.api = None
 
     @property
-    def userid(self):
+    def userid(self) -> str:
         obj = db.users.find_one({'uid': self.id})
         return obj and obj['userid']
 
@@ -58,7 +58,7 @@ class User(UserMixin):
                         "$set": {"userid": userid}}, upsert=True)
 
     @property
-    def passwd(self):
+    def passwd(self) -> str:
         obj = db.users.find_one({'uid': self.id})
         return obj and obj['passwd']
 
@@ -68,7 +68,7 @@ class User(UserMixin):
                         "$set": {"passwd": passwd}}, upsert=True)
 
     @property
-    def course(self):
+    def course(self) -> str:
         obj = db.users.find_one({'uid': self.id})
         return obj and obj['course']
 
@@ -78,7 +78,7 @@ class User(UserMixin):
                         "$set": {"course": course}}, upsert=True)
 
     @property
-    def email(self):
+    def email(self) -> str:
         obj = db.users.find_one({'uid': self.id})
         return obj and obj['email']
 
@@ -96,7 +96,7 @@ def user_loader(userid):
         return None
 
 
-# 寫死的題目標題、敘述、標籤
+# 由外部提供題目標題、敘述、標籤
 try:
     f = open(sys.path[0] + '/question.json', 'r')
     ext_questions = json.load(f)
@@ -196,13 +196,12 @@ def login_page():
             if useruid in users:
                 users[useruid].api = api
             else:
-                user = User(useruid)
-                user.userid = userid
-                user.passwd = passwd
-                user.course = course
-                user.email = ''
-                user.api = api
-                users[useruid] = user
+                users[useruid] = User(useruid)
+                users[useruid].userid = userid
+                users[useruid].passwd = passwd
+                users[useruid].course = course
+                users[useruid].email = ''
+                users[useruid].api = api
             return redirect('/')
         else:
             # 顯示登入畫面含錯誤訊息
@@ -289,46 +288,33 @@ def question_page():
     # 取得使用者 ID
     userid = users[useruid].userid
 
-    # 顯示題目列表
+    # 所有題目列表
     questions = {}
 
-    # 抓 API 裡的題目資訊
-    api_question = users[useruid].api.list_questions()
+    # 取得 API 裡的題目資訊
+    api_question = users[useruid].api.get_question()
     for num in api_question:
         questions[num] = {
             'title': '未命名',
             'description': '沒有敘述',
             'tag': '',
-            'deadline': api_question[num][0],
-            # 繳交期限是否到
-            'submit': api_question[num][1],
-            # 繳交狀態
-            'status': api_question[num][2],
-            'language': api_question[num][3],
+            'deadline': api_question[num]['deadline'],
+            'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
+            'status': '已繳' if api_question[num]['status'] else '未繳',
+            'language': api_question[num]['language'],
             'results': users[useruid].api.list_results(num, userid),
         }
 
-    # 抓外部寫死的題目資訊
+    # 取得外部提供的題目資訊
     for num in ext_questions:
         # 如果 API 沒有這題就跳過
         if not num in api_question:
             continue
         # 新增外部資訊
-        try:
-            questions[num]['title'] = ext_questions[num]['title']
-        except KeyError:
-            pass
-
-        try:
-            questions[num]['description'] = ext_questions[num]['description']
-        except KeyError:
-            pass
-
-        try:
-            questions[num]['tag'] = ext_questions[num]['tag']
-        except KeyError:
-            pass
-
+        questions[num]['title'] = ext_questions[num]['title']
+        questions[num]['description'] = ext_questions[num]['description']
+        questions[num]['tag'] = ext_questions[num]['tag']
+        
     closed = {}
     opened = {}
 
@@ -388,23 +374,21 @@ def question_number_page(number):
         # 顯示題目列表
         questions = {}
 
-        # 抓 API 裡的題目資訊
-        api_question = users[useruid].api.list_questions()
+        # 取得 API 裡的題目資訊
+        api_question = users[useruid].api.get_question()
         for num in api_question:
             questions[num] = {
                 'title': '未命名',
                 'description': '沒有敘述',
                 'tag': '',
-                'deadline': api_question[num][0],
-                # 繳交期限是否到
-                'submit': api_question[num][1],
-                # 繳交狀態
-                'status': api_question[num][2],
-                'language': api_question[num][3],
+                'deadline': api_question[num]['deadline'],
+                'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
+                'status': '已繳' if api_question[num]['status'] else '未繳',
+                'language': api_question[num]['language'],
                 'results': users[useruid].api.list_results(num, userid),
             }
 
-        # 抓外部寫死的題目資訊
+        # 取得外部提供的題目資訊
         for num in ext_questions:
             # 如果 API 沒有這題就跳過
             if not num in api_question:
@@ -494,23 +478,21 @@ def question_number_forum_page(number):
         # 顯示題目列表
         questions = {}
 
-        # 抓 API 裡的題目資訊
-        api_question = users[useruid].api.list_questions()
+        # 取得 API 裡的題目資訊
+        api_question = users[useruid].api.get_question()
         for num in api_question:
             questions[num] = {
                 'title': '未命名',
                 'description': '沒有敘述',
                 'tag': '',
-                'deadline': api_question[num][0],
-                # 繳交期限是否到
-                'submit': api_question[num][1],
-                # 繳交狀態
-                'status': api_question[num][2],
-                'language': api_question[num][3],
+                'deadline': api_question[num]['deadline'],
+                'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
+                'status': '已繳' if api_question[num]['status'] else '未繳',
+                'language': api_question[num]['language'],
                 'results': users[useruid].api.list_results(num, userid),
             }
 
-        # 抓外部寫死的題目資訊
+        # 取得外部提供的題目資訊
         for num in ext_questions:
             # 如果 API 沒有這題就跳過
             if not num in api_question:
@@ -571,23 +553,21 @@ def question_number_passed_page(number):
     # 顯示題目列表
     questions = {}
 
-    # 抓 API 裡的題目資訊
-    api_question = users[useruid].api.list_questions()
+    # 取得 API 裡的題目資訊
+    api_question = users[useruid].api.get_question()
     for num in api_question:
         questions[num] = {
             'title': '未命名',
             'description': '沒有敘述',
             'tag': '',
-            'deadline': api_question[num][0],
-            # 繳交期限是否到
-            'submit': api_question[num][1],
-            # 繳交狀態
-            'status': api_question[num][2],
-            'language': api_question[num][3],
+            'deadline': api_question[num]['deadline'],
+            'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
+            'status': '已繳' if api_question[num]['status'] else '未繳',
+            'language': api_question[num]['language'],
             'results': users[useruid].api.list_results(num, userid),
         }
 
-    # 抓外部寫死的題目資訊
+    # 取得外部提供的題目資訊
     for num in ext_questions:
         # 如果 API 沒有這題就跳過
         if not num in api_question:
