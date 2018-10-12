@@ -432,7 +432,7 @@ def question_number_page(number):
         code = request.form['code']
         # 定義檔名
         filename = userid + number
-        language = users[useruid].api.list_questions()[number][3]
+        language = users[useruid].api.get_question()[number]['language']
         if language == 'Python':
             filename += '.py'
         if language == 'Java':
