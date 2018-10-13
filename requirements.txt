@@ -4,3 +4,4 @@ flask
 flask-login
 pymongo
 KCOJ-api
+gunicorn
