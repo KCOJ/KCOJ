@@ -48,7 +48,7 @@ from question import QUESTIONS
 ext_questions = QUESTIONS
 
 
-def keep_login():
+def keep_active():
     """
     試著保持著登入狀態
     """
@@ -78,7 +78,7 @@ def index_page():
     主畫面
     """
     # 嘗試保持登入狀態
-    if not keep_login():
+    if not keep_active():
         logout_user()
     # 取得使用者 UID
     useruid = current_user.get_id()
@@ -153,7 +153,7 @@ def user_page():
     個人資料畫面
     """
     # 嘗試保持登入狀態
-    if not keep_login():
+    if not keep_active():
         logout_user()
     # 取得使用者 UID
     useruid = current_user.get_id()
@@ -215,7 +215,7 @@ def question_page():
     作業題庫畫面
     """
     # 嘗試保持登入狀態
-    if not keep_login():
+    if not keep_active():
         logout_user()
     # 取得使用者 UID
     useruid = current_user.get_id()
@@ -297,7 +297,7 @@ def question_number_page(number):
     作業題目畫面
     """
     # 嘗試保持登入狀態
-    if not keep_login():
+    if not keep_active():
         logout_user()
     # 取得使用者 UID
     useruid = current_user.get_id()
@@ -401,7 +401,7 @@ def question_number_forum_page(number):
     作業討論畫面
     """
     # 嘗試保持登入狀態
-    if not keep_login():
+    if not keep_active():
         logout_user()
     # 取得使用者 UID
     useruid = current_user.get_id()
@@ -477,7 +477,7 @@ def question_number_passed_page(number):
     作業通過畫面
     """
     # 嘗試保持登入狀態
-    if not keep_login():
+    if not keep_active():
         logout_user()
     # 取得使用者 UID
     useruid = current_user.get_id()
