@@ -4,7 +4,6 @@ from base64 import b64encode
 from os.path import isdir, isfile
 import os
 import sys
-import json
 import hashlib
 
 from flask import Flask, request, redirect, render_template
@@ -96,12 +95,8 @@ def user_loader(userid):
 
 
 # 由外部提供題目標題、敘述、標籤
-try:
-    f = open(sys.path[0] + '/question.json', 'r')
-    ext_questions = json.load(f)
-    f.close()
-except FileNotFoundError:
-    ext_questions = {}
+from question import QUESTIONS
+ext_questions = QUESTIONS
 
 
 def keep_login():
@@ -313,7 +308,7 @@ def question_page():
         questions[num]['title'] = ext_questions[num]['title']
         questions[num]['description'] = ext_questions[num]['description']
         questions[num]['tag'] = ext_questions[num]['tag']
-        
+
     closed = {}
     opened = {}
 
