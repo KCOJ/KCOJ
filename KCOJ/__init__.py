@@ -1,25 +1,13 @@
-#!/usr/bin/env python3
-
-from base64 import b64encode
-from os.path import isdir, isfile
 import os
 import sys
-
 from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
 
-from config import CONFIG
-from user import User
-from utils.gravatar import Gravatar
-
-# 自動產生 instance 的 key
-if not isdir(sys.path[0] + '/instance'):
-    os.mkdir(sys.path[0] + '/instance')
-if not isfile(sys.path[0] + '/instance/config.py'):
-    with open(sys.path[0] + '/instance/config.py', 'w') as f:
-        f.write('SECRET_KEY = \'' +
-                b64encode(os.urandom(8)).decode('utf-8') + '\'')
+from .utils.gravatar import Gravatar
+from .question import QUESTIONS
+from .config import CONFIG
+from .user import User
 
 # 初始化 Flask
 app = Flask(__name__,
@@ -44,7 +32,6 @@ def user_loader(userid):
 
 
 # 由外部提供題目標題、敘述、標籤
-from question import QUESTIONS
 ext_questions = QUESTIONS
 
 
@@ -560,12 +547,3 @@ def logout_nopage():
     """
     logout_user()
     return redirect('/login')
-
-
-def main():
-    # 開啟伺服器
-    app.run(port=11711, threaded=True)
-
-
-if __name__ == '__main__':
-    main()
