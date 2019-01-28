@@ -4,7 +4,6 @@ from base64 import b64encode
 from os.path import isdir, isfile
 import os
 import sys
-import hashlib
 
 from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -12,6 +11,7 @@ from KCOJ_api import KCOJ
 
 from config import CONFIG
 from user import User
+from utils.gravatar import Gravatar
 
 # 自動產生 instance 的 key
 if not isdir(sys.path[0] + '/instance'):
@@ -71,15 +71,6 @@ def keep_login():
     return users[useruid].api.active
 
 
-def get_gravatar(email, size):
-    """
-    取得 Gravatar 上的大頭貼
-    """
-    # 直接回傳網址
-    return 'https://s.gravatar.com/avatar/{PROFILE}?size={SIZE}'.format(
-        PROFILE=hashlib.md5(bytes(email, 'utf-8')).hexdigest(), SIZE=str(size))
-
-
 @app.route('/', methods=['GET'], strict_slashes=False)
 @login_required
 def index_page():
@@ -96,7 +87,7 @@ def index_page():
         'index.j2',
         title="KCOJ - 首頁",
         userid=users[useruid].userid,
-        profile_image=get_gravatar(users[useruid].email, 30),
+        profile_image=Gravatar(users[useruid].email).set_size(30).image,
         notices=users[useruid].api.get_notices())
 
 
@@ -189,10 +180,10 @@ def user_page():
             'user.j2',
             title=("KCOJ - " + view_userid),
             userid=userid,
-            profile_image=get_gravatar(users[useruid].email, 30),
+            profile_image=Gravatar(users[useruid].email).set_size(30).image,
             view_userid=view_userid,
             view_email=view_email,
-            view_gravatar=get_gravatar(view_email, 200),
+            view_gravatar=Gravatar(view_email).set_size(200).image,
             no_me=(userid != view_userid))
 
     if request.method == 'POST':
@@ -292,7 +283,7 @@ def question_page():
         'question.j2',
         title="KCOJ - " + users[useruid].course + " 題庫",
         userid=userid,
-        profile_image=get_gravatar(users[useruid].email, 30),
+        profile_image=Gravatar(users[useruid].email).set_size(30).image,
         course=users[useruid].course,
         opened_questions=opened,
         closed_questions=closed)
@@ -363,7 +354,7 @@ def question_number_page(number):
             'question_number.j2',
             title=("KCOJ - " + users[useruid].course + " " + number),
             userid=userid,
-            profile_image=get_gravatar(users[useruid].email, 30),
+            profile_image=Gravatar(users[useruid].email).set_size(30).image,
             question_number=number,
             question_title=question['title'],
             question_content=content,
@@ -467,7 +458,7 @@ def question_number_forum_page(number):
             'question_number_forum.j2',
             title=("KCOJ - " + users[useruid].course + " " + number),
             userid=userid,
-            profile_image=get_gravatar(users[useruid].email, 30),
+            profile_image=Gravatar(users[useruid].email).set_size(30).image,
             question_number=number,
             question_title=question['title'],
             question_content=content,
@@ -546,13 +537,13 @@ def question_number_passed_page(number):
         except KeyError:
             passer_email = ''
 
-        passers_info[passer] = get_gravatar(passer_email, 25)
+        passers_info[passer] = Gravatar(passer_email).set_size(25).image
 
     return render_template(
         'question_number_passed.j2',
         title=("KCOJ - " + users[useruid].course + " " + number),
         userid=userid,
-        profile_image=get_gravatar(users[useruid].email, 30),
+        profile_image=Gravatar(users[useruid].email).set_size(30).image,
         question_number=number,
         question_title=question['title'],
         question_content=content,
