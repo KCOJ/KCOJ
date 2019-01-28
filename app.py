@@ -29,7 +29,7 @@ db = MongoClient().kcoj
 
 # 初始化 Flask
 app = Flask(__name__,
-            template_folder='template',
+            template_folder='views',
             instance_relative_config=True)
 app.config.from_pyfile('config.py')
 
