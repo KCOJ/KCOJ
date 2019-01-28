@@ -13,8 +13,7 @@ from pymongo import MongoClient
 from KCOJ_api import KCOJ
 
 # 讀取配置
-with open(sys.path[0] + '/config.json', 'r') as f:
-    config = json.load(f)
+from config import CONFIG
 
 # 自動產生 instance 的 key
 if not isdir(sys.path[0] + '/instance'):
@@ -113,7 +112,7 @@ def keep_login():
     useruid = current_user.get_id()
     # 建立使用者物件
     users[useruid] = User(useruid)
-    users[useruid].api = users[useruid].api or KCOJ(config['TARGET']['URL'])
+    users[useruid].api = users[useruid].api or KCOJ(CONFIG['TARGET']['URL'])
     # 確認是否是登入狀態
     if users[useruid].api.active:
         return True
@@ -171,7 +170,7 @@ def login_page():
     登入畫面
     """
     # 使用 API
-    api = KCOJ(config['TARGET']['URL'])
+    api = KCOJ(CONFIG['TARGET']['URL'])
 
     if request.method == 'GET':
         # 顯示登入畫面
@@ -258,7 +257,7 @@ def user_page():
         new_passwd = request.form['new_passwd']
         email = request.form['email']
         # 登入交作業網站
-        api = KCOJ(config['TARGET']['URL'])
+        api = KCOJ(CONFIG['TARGET']['URL'])
         api.login(userid, old_passwd,
                   api.courses.index(users[useruid].course) + 1)
         # 確認是否登入成功
