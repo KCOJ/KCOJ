@@ -9,6 +9,7 @@ class User(UserMixin):
     def __init__(self, useruid: str):
         super()
         self.id = useruid
+        self.api = None
 
     @staticmethod
     def is_exist(userid: str):
