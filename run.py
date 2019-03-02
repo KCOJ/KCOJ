@@ -3,8 +3,6 @@ import sys
 from os.path import isdir, isfile
 from base64 import b64encode
 
-from KCOJ.user import User
-
 
 def main():
     # 產生 instance 的 key
@@ -13,9 +11,10 @@ def main():
     if not isfile(sys.path[0] + '/instance/config.py'):
         with open(sys.path[0] + '/instance/config.py', 'w') as f:
             f.write('SECRET_KEY = \'{SECRET_KEY}\''.format(
-                SECRET_KEY=b64encode(os.urandom(8)).decode('utf-8')))
+                SECRET_KEY=b64encode(os.urandom(32)).decode('utf-8')))
 
     # 初始化資料庫
+    from KCOJ.user import User
     User.create_table()
 
     # 開啟伺服器
