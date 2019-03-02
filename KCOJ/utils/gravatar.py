@@ -17,6 +17,5 @@ class Gravatar:
         """
         url = 'https://s.gravatar.com/avatar/{PROFILE}?size={SIZE}'
         url = url.format(PROFILE=hashlib.md5(
-            bytes(self.__email, 'utf-8')).hexdigest())
-        url = url.format(SIZE=str(self.__size))
+            bytes(self.__email, 'utf-8')).hexdigest(), SIZE=str(self.__size))
         return url
