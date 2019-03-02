@@ -1,7 +1,7 @@
-from os.path import isdir, isfile
-from base64 import b64encode
 import os
 import sys
+from os.path import isdir, isfile
+from base64 import b64encode
 
 
 def main():
