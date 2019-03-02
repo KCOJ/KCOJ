@@ -15,7 +15,7 @@ class Gravatar:
         """
         取得特定用戶 Gravatar 上的大頭貼網址
         """
-        url = 'https://s.gravatar.com/avatar/{PROFILE}?size={SIZE}'
-        url = url.format(PROFILE=hashlib.md5(
-            bytes(self.__email, 'utf-8')).hexdigest(), SIZE=str(self.__size))
+        url = 'https://s.gravatar.com/avatar/{PROFILE}?size={SIZE}'.format(
+            PROFILE=hashlib.md5(bytes(self.__email, 'utf-8')).hexdigest(),
+            SIZE=str(self.__size))
         return url
