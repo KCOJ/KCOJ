@@ -521,7 +521,7 @@ def question_number_passed_page(number):
     for passer in passers:
         try:
             passer_email = users[passer + users[useruid].course]['email']
-        except KeyError:
+        except Exception:   # TODO: I don't know!
             passer_email = ''
 
         passers_info[passer] = Gravatar(passer_email).set_size(25).image
