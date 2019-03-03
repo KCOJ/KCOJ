@@ -13,7 +13,7 @@ if not isfile(sys.path[0] + '/instance/config.py'):
             SECRET_KEY=b64encode(os.urandom(32)).decode('utf-8')))
 
 # 初始化資料庫
-from KCOJ.user import User
+from KCOJ.models.user import User
 User.create_table()
 
 # 開啟伺服器

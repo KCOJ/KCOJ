@@ -7,7 +7,7 @@ from KCOJ_api import KCOJ
 from .utils.gravatar import Gravatar
 from .question import QUESTIONS
 from .config import CONFIG
-from .user import User
+from .models.user import User
 
 # 初始化 Flask
 app = Flask(__name__,
