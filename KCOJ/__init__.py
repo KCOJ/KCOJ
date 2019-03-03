@@ -4,10 +4,11 @@ from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
 
+from .utils.sessions import getSession, revokeSession
 from .utils.gravatar import Gravatar
+from .models.user import User
 from .question import QUESTIONS
 from .config import CONFIG
-from .models.user import User
 
 # 初始化 Flask
 app = Flask(__name__,
@@ -17,10 +18,6 @@ app.config.from_pyfile('config.py')
 
 # 初始化 Flask 登入管理員
 login_manager = LoginManager(app)
-
-
-# 儲存使用者資訊
-users = {}
 
 
 @login_manager.user_loader
@@ -35,27 +32,28 @@ def user_loader(useruid):
 ext_questions = QUESTIONS
 
 
-def keep_active():
+def keep_active(useruid: str):
     """
     試著保持著登入狀態
     """
-    # 取得使用者 UID
-    useruid = current_user.get_id()
-    # 建立使用者物件
-    users[useruid] = User(useruid)
-    users[useruid].api = users[useruid].api or KCOJ(CONFIG['TARGET']['URL'])
-    # 確認是否是登入狀態
-    if users[useruid].api.active:
+    # 取得使用者物件
+    user = User(useruid)
+    session = getSession(useruid)
+
+    # 確認登入狀態
+    if session.active:
         return True
-    # 嘗試登入
+
+    # 嘗試重新登入
     try:
-        users[useruid].api.login(users[useruid].userid,
-                                 users[useruid].passwd,
-                                 users[useruid].api.courses.index(users[useruid].course) + 1)
+        session.login(user.userid,
+                      user.passwd,
+                      session.courses.index(user.course) + 1)
     except IndexError:
         return False
-    # 回傳狀態
-    return users[useruid].api.active
+
+    # 直接回傳登入狀態
+    return session.active
 
 
 @app.route('/', methods=['GET'], strict_slashes=False)
@@ -64,18 +62,22 @@ def index_page():
     """
     主畫面
     """
-    # 嘗試保持登入狀態
-    if not keep_active():
-        logout_user()
-    # 取得使用者 UID
+    # 取得使用者物件
     useruid = current_user.get_id()
+    user = User(useruid)
+    session = getSession(useruid)
+
+    # 嘗試保持登入狀態
+    if not keep_active(useruid):
+        logout_user()
+
     # 顯示主畫面
     return render_template(
         'index.j2',
         title="KCOJ - 首頁",
-        userid=users[useruid].userid,
-        profile_image=Gravatar(users[useruid].email).set_size(30).image,
-        notices=users[useruid].api.get_notices())
+        userid=user.userid,
+        profile_image=Gravatar(user.email).set_size(30).image,
+        notices=session.get_notices())
 
 
 @login_manager.unauthorized_handler
@@ -91,15 +93,15 @@ def login_page():
     """
     登入畫面
     """
-    # 使用 API
-    api = KCOJ(CONFIG['TARGET']['URL'])
+    # 新增會話
+    session = KCOJ(CONFIG['TARGET']['URL'])
 
     if request.method == 'GET':
         # 顯示登入畫面
         return render_template(
             'login.j2',
             title="KCOJ - 登入",
-            courses=api.courses)
+            courses=session.courses)
 
     if request.method == 'POST':
         # 取得登入資訊
@@ -107,29 +109,30 @@ def login_page():
         passwd = request.form['passwd']
         course = request.form['course']
         useruid = userid + course
-        # 登入交作業網站
-        api.login(userid, passwd, api.courses.index(course) + 1)
+
+        # 登入網站
+        session.login(userid, passwd, session.courses.index(course) + 1)
+
         # 確認是否登入成功
-        if api.active:
+        if session.active:
             # 登入成功
             login_user(User(useruid))
-            # 將登入資訊儲存起來
-            if useruid in users:
-                users[useruid].api = api
-            else:
-                users[useruid] = User(useruid)
-                users[useruid].userid = userid
-                users[useruid].passwd = passwd
-                users[useruid].course = course
-                users[useruid].email = ''
-                users[useruid].api = api
+
+            # 將使用者資訊儲存起來
+            user = User(useruid)
+            user.userid = userid
+            user.passwd = passwd
+            user.course = course
+            user.email = ''
+
             return redirect('/')
+
         else:
-            # 顯示登入畫面含錯誤訊息
+            # 顯示包含錯誤訊息的登入畫面
             return render_template(
                 'login.j2',
                 title="KCOJ - 登入",
-                courses=api.courses,
+                courses=session.courses,
                 error_message="登入失敗，請檢查輸入的資訊是否有誤！")
 
 
@@ -139,13 +142,17 @@ def user_page():
     """
     個人資料畫面
     """
-    # 嘗試保持登入狀態
-    if not keep_active():
-        logout_user()
-    # 取得使用者 UID
+    # 取得使用者物件
     useruid = current_user.get_id()
+    user = User(useruid)
+    session = getSession(useruid)
+
+    # 嘗試保持登入狀態
+    if not keep_active(useruid):
+        logout_user()
+
     # 取得使用者 ID
-    userid = users[useruid].userid
+    userid = user.userid
 
     if request.method == 'GET':
         # 取得要查看的使用者 ID
@@ -155,11 +162,11 @@ def user_page():
             view_userid = userid
         # 取得要查看的使用者 Email
         try:
-            view_email = users[view_userid + users[useruid].course].email
+            view_email = User(view_userid + user.course).email
         except KeyError:
             if view_userid == userid:
                 # 如果查看是自己的話就顯示自己的 Email
-                view_email = users[useruid].email
+                view_email = user.email
             else:
                 view_email = ''
 
@@ -167,7 +174,7 @@ def user_page():
             'user.j2',
             title=("KCOJ - " + view_userid),
             userid=userid,
-            profile_image=Gravatar(users[useruid].email).set_size(30).image,
+            profile_image=Gravatar(user.email).set_size(30).image,
             view_userid=view_userid,
             view_email=view_email,
             view_gravatar=Gravatar(view_email).set_size(200).image,
@@ -181,16 +188,16 @@ def user_page():
         # 登入交作業網站
         api = KCOJ(CONFIG['TARGET']['URL'])
         api.login(userid, old_passwd,
-                  api.courses.index(users[useruid].course) + 1)
+                  api.courses.index(user.course) + 1)
         # 確認是否登入成功
         if api.active:
             # 如果要變更密碼
             if new_passwd != '':
                 api.update_password(new_passwd)
-                users[useruid].passwd = new_passwd
+                user.passwd = new_passwd
             # 如果要變更 Email
             if email != '':
-                users[useruid].email = email
+                user.email = email
 
         return redirect('/user')
 
@@ -201,19 +208,23 @@ def question_page():
     """
     作業題庫畫面
     """
-    # 嘗試保持登入狀態
-    if not keep_active():
-        logout_user()
-    # 取得使用者 UID
+    # 取得使用者物件
     useruid = current_user.get_id()
+    user = User(useruid)
+    session = getSession(useruid)
+
+    # 嘗試保持登入狀態
+    if not keep_active(useruid):
+        logout_user()
+
     # 取得使用者 ID
-    userid = users[useruid].userid
+    userid = user.userid
 
     # 所有題目列表
     questions = {}
 
     # 取得 API 裡的題目資訊
-    api_question = users[useruid].api.get_question()
+    api_question = session.get_question()
     for num in api_question:
         questions[num] = {
             'title': '未命名',
@@ -223,7 +234,7 @@ def question_page():
             'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
             'status': '已繳' if api_question[num]['status'] else '未繳',
             'language': api_question[num]['language'],
-            'results': users[useruid].api.list_results(num, userid),
+            'results': session.list_results(num, userid),
         }
 
     # 取得外部提供的題目資訊
@@ -268,10 +279,10 @@ def question_page():
 
     return render_template(
         'question.j2',
-        title="KCOJ - " + users[useruid].course + " 題庫",
+        title="KCOJ - " + user.course + " 題庫",
         userid=userid,
-        profile_image=Gravatar(users[useruid].email).set_size(30).image,
-        course=users[useruid].course,
+        profile_image=Gravatar(user.email).set_size(30).image,
+        course=user.course,
         opened_questions=opened,
         closed_questions=closed)
 
@@ -283,20 +294,24 @@ def question_number_page(number):
     """
     作業題目畫面
     """
-    # 嘗試保持登入狀態
-    if not keep_active():
-        logout_user()
-    # 取得使用者 UID
+    # 取得使用者物件
     useruid = current_user.get_id()
+    user = User(useruid)
+    session = getSession(useruid)
+
+    # 嘗試保持登入狀態
+    if not keep_active(useruid):
+        logout_user()
+
     # 取得使用者 ID
-    userid = users[useruid].userid
+    userid = user.userid
 
     if request.method == 'GET':
         # 顯示題目列表
         questions = {}
 
         # 取得 API 裡的題目資訊
-        api_question = users[useruid].api.get_question()
+        api_question = session.get_question()
         for num in api_question:
             questions[num] = {
                 'title': '未命名',
@@ -306,7 +321,7 @@ def question_number_page(number):
                 'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
                 'status': '已繳' if api_question[num]['status'] else '未繳',
                 'language': api_question[num]['language'],
-                'results': users[useruid].api.list_results(num, userid),
+                'results': session.list_results(num, userid),
             }
 
         # 取得外部提供的題目資訊
@@ -335,13 +350,13 @@ def question_number_page(number):
         for result in question['results']:
             test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-        content = users[useruid].api.get_question_content(number)
+        content = session.get_question_content(number)
 
         return render_template(
             'question_number.j2',
-            title=("KCOJ - " + users[useruid].course + " " + number),
+            title=("KCOJ - " + user.course + " " + number),
             userid=userid,
-            profile_image=Gravatar(users[useruid].email).set_size(30).image,
+            profile_image=Gravatar(user.email).set_size(30).image,
             question_number=number,
             question_title=question['title'],
             question_content=content,
@@ -353,7 +368,7 @@ def question_number_page(number):
         code = request.form['code']
         # 定義檔名
         filename = userid + number
-        language = users[useruid].api.get_question()[number]['language']
+        language = session.get_question()[number]['language']
         if language == 'Python':
             filename += '.py'
         if language == 'Java':
@@ -366,9 +381,9 @@ def question_number_page(number):
         with open(sys.path[0] + '/' + filename, 'w') as f:
             f.write(code)
         # 刪除原本的程式碼
-        users[useruid].api.delete_question_answer(number)
+        session.delete_question_answer(number)
         # 上傳並判斷是否成功
-        if users[useruid].api.post_question_answer(number, "Send from KCOJ", filename):
+        if session.post_question_answer(number, "Send from KCOJ", filename):
             # TODO: 提示上傳成功
             pass
         else:
@@ -387,20 +402,24 @@ def question_number_forum_page(number):
     """
     作業討論畫面
     """
-    # 嘗試保持登入狀態
-    if not keep_active():
-        logout_user()
-    # 取得使用者 UID
+    # 取得使用者物件
     useruid = current_user.get_id()
+    user = User(useruid)
+    session = getSession(useruid)
+
+    # 嘗試保持登入狀態
+    if not keep_active(useruid):
+        logout_user()
+
     # 取得使用者 ID
-    userid = users[useruid].userid
+    userid = user.userid
 
     if request.method == 'GET':
         # 顯示題目列表
         questions = {}
 
         # 取得 API 裡的題目資訊
-        api_question = users[useruid].api.get_question()
+        api_question = session.get_question()
         for num in api_question:
             questions[num] = {
                 'title': '未命名',
@@ -410,7 +429,7 @@ def question_number_forum_page(number):
                 'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
                 'status': '已繳' if api_question[num]['status'] else '未繳',
                 'language': api_question[num]['language'],
-                'results': users[useruid].api.list_results(num, userid),
+                'results': session.list_results(num, userid),
             }
 
         # 取得外部提供的題目資訊
@@ -439,13 +458,13 @@ def question_number_forum_page(number):
         for result in question['results']:
             test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-        content = users[useruid].api.get_question_content(number)
+        content = session.get_question_content(number)
 
         return render_template(
             'question_number_forum.j2',
-            title=("KCOJ - " + users[useruid].course + " " + number),
+            title=("KCOJ - " + user.course + " " + number),
             userid=userid,
-            profile_image=Gravatar(users[useruid].email).set_size(30).image,
+            profile_image=Gravatar(user.email).set_size(30).image,
             question_number=number,
             question_title=question['title'],
             question_content=content,
@@ -463,19 +482,23 @@ def question_number_passed_page(number):
     """
     作業通過畫面
     """
-    # 嘗試保持登入狀態
-    if not keep_active():
-        logout_user()
-    # 取得使用者 UID
+    # 取得使用者物件
     useruid = current_user.get_id()
+    user = User(useruid)
+    session = getSession(useruid)
+
+    # 嘗試保持登入狀態
+    if not keep_active(useruid):
+        logout_user()
+
     # 取得使用者 ID
-    userid = users[useruid].userid
+    userid = user.userid
 
     # 顯示題目列表
     questions = {}
 
     # 取得 API 裡的題目資訊
-    api_question = users[useruid].api.get_question()
+    api_question = session.get_question()
     for num in api_question:
         questions[num] = {
             'title': '未命名',
@@ -485,7 +508,7 @@ def question_number_passed_page(number):
             'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
             'status': '已繳' if api_question[num]['status'] else '未繳',
             'language': api_question[num]['language'],
-            'results': users[useruid].api.list_results(num, userid),
+            'results': session.list_results(num, userid),
         }
 
     # 取得外部提供的題目資訊
@@ -514,13 +537,13 @@ def question_number_passed_page(number):
     for result in question['results']:
         test_cases.append([int(result[1] == '通過測試'), result[0], result[1]])
 
-    content = users[useruid].api.get_question_content(number)
+    content = session.get_question_content(number)
 
     passers_info = {}
-    passers = users[useruid].api.get_question_passers(number)
+    passers = session.get_question_passers(number)
     for passer in passers:
         try:
-            passer_email = users[passer + users[useruid].course]['email']
+            passer_email = User(passer + user.course).email
         except Exception:   # TODO: I don't know!
             passer_email = ''
 
@@ -528,9 +551,9 @@ def question_number_passed_page(number):
 
     return render_template(
         'question_number_passed.j2',
-        title=("KCOJ - " + users[useruid].course + " " + number),
+        title=("KCOJ - " + user.course + " " + number),
         userid=userid,
-        profile_image=Gravatar(users[useruid].email).set_size(30).image,
+        profile_image=Gravatar(user.email).set_size(30).image,
         question_number=number,
         question_title=question['title'],
         question_content=content,
