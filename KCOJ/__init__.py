@@ -24,9 +24,9 @@ users = {}
 
 
 @login_manager.user_loader
-def user_loader(userid):
-    if User.is_exist(userid):
-        return User(userid)
+def user_loader(useruid):
+    if User.is_exist(useruid):
+        return User(useruid)
     else:
         return None
 
