@@ -10,6 +10,3 @@ def getSession(useruid: str):
         sessions[useruid] = KCOJ(CONFIG['TARGET']['URL'])
 
     return sessions[useruid]
-
-def revokeSession(useruid: str):
-    sessions.pop(useruid)

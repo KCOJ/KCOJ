@@ -4,7 +4,7 @@ from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
 
-from .utils.sessions import getSession, revokeSession
+from .utils.sessions import getSession
 from .utils.gravatar import Gravatar
 from .models.user import User
 from .question import QUESTIONS
