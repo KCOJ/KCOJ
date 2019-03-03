@@ -4,7 +4,7 @@ from flask import Flask, request, redirect, render_template
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from KCOJ_api import KCOJ
 
-from .utils.sessions import getSession
+from .utils.sessions import get_session
 from .utils.gravatar import Gravatar
 from .models.user import User
 from .question import QUESTIONS
@@ -38,7 +38,7 @@ def keep_active(useruid: str):
     """
     # 取得使用者物件
     user = User(useruid)
-    session = getSession(useruid)
+    session = get_session(useruid)
 
     # 確認登入狀態
     if session.active:
@@ -65,7 +65,7 @@ def index_page():
     # 取得使用者物件
     useruid = current_user.get_id()
     user = User(useruid)
-    session = getSession(useruid)
+    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
@@ -145,7 +145,7 @@ def user_page():
     # 取得使用者物件
     useruid = current_user.get_id()
     user = User(useruid)
-    session = getSession(useruid)
+    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
@@ -211,7 +211,7 @@ def question_page():
     # 取得使用者物件
     useruid = current_user.get_id()
     user = User(useruid)
-    session = getSession(useruid)
+    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
@@ -297,7 +297,7 @@ def question_number_page(number):
     # 取得使用者物件
     useruid = current_user.get_id()
     user = User(useruid)
-    session = getSession(useruid)
+    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
@@ -405,7 +405,7 @@ def question_number_forum_page(number):
     # 取得使用者物件
     useruid = current_user.get_id()
     user = User(useruid)
-    session = getSession(useruid)
+    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
@@ -485,7 +485,7 @@ def question_number_passed_page(number):
     # 取得使用者物件
     useruid = current_user.get_id()
     user = User(useruid)
-    session = getSession(useruid)
+    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):

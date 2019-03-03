@@ -5,7 +5,7 @@ from ..config import CONFIG
 sessions = {}
 
 
-def getSession(useruid: str):
+def get_session(useruid: str):
     if not useruid in sessions:
         sessions[useruid] = KCOJ(CONFIG['TARGET']['URL'])
 
