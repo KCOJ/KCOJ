@@ -10,6 +10,7 @@ from ..models.user import User
 from ..controllers.keep_active import keep_active
 from ..controllers.index_page import main as index_page
 from ..controllers.login_page import main as login_page
+from ..controllers.login import main as login
 from ..question import QUESTIONS
 from ..config import CONFIG
 
@@ -41,9 +42,6 @@ def login_route():
     """
     登入畫面
     """
-    # 新增會話
-    session = KCOJ(CONFIG['TARGET']['URL'])
-
     if request.method == 'GET':
         # 顯示登入畫面
         return login_page()
@@ -53,32 +51,9 @@ def login_route():
         userid = request.form['userid']
         passwd = request.form['passwd']
         course = request.form['course']
-        useruid = userid + course
+        
+        return login(userid, passwd, course)
 
-        # 登入網站
-        session.login(userid, passwd, session.courses.index(course) + 1)
-
-        # 確認是否登入成功
-        if session.active:
-            # 登入成功
-            login_user(User(useruid))
-
-            # 將使用者資訊儲存起來
-            user = User(useruid)
-            user.userid = userid
-            user.passwd = passwd
-            user.course = course
-            user.email = ''
-
-            return redirect('/')
-
-        else:
-            # 顯示包含錯誤訊息的登入畫面
-            return render_template(
-                'login.j2',
-                title="KCOJ - 登入",
-                courses=session.courses,
-                error_message="登入失敗，請檢查輸入的資訊是否有誤！")
 
 
 @app.route('/user', methods=['GET', 'POST'], strict_slashes=False)
