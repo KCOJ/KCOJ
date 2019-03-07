@@ -4,7 +4,7 @@ from ..utils.sessions import get_session
 from ..utils.gravatar import Gravatar
 
 
-def main(useruid):
+def main(useruid: str):
     """
     首頁畫面
     """
