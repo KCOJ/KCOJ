@@ -328,7 +328,7 @@ def question_number_passed_page(number):
     passers = session.get_question_passers(number)
     for passer in passers:
         try:
-            passer_email = User(passer + user.course).email
+            passer_email = User(passer + user.course).email or ''
         except Exception:   # TODO: I don't know!
             passer_email = ''
 
