@@ -1,8 +1,11 @@
+import urllib3
 from flask import Flask, redirect
 from flask_login import LoginManager
 
 from .models.user import User
 from .routes.pages import app as pages_api
+
+urllib3.disable_warnings()
 
 # 初始化 Flask
 app = Flask(__name__,
