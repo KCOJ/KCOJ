@@ -11,6 +11,7 @@ from ..controllers.keep_active import keep_active
 from ..controllers.index_page import main as index_page
 from ..controllers.login_page import main as login_page
 from ..controllers.login import main as login
+from ..controllers.user_page import main as user_page
 from ..question import QUESTIONS
 from ..config import CONFIG
 
@@ -51,16 +52,15 @@ def login_route():
         userid = request.form['userid']
         passwd = request.form['passwd']
         course = request.form['course']
-        
-        return login(userid, passwd, course)
 
+        return login(userid, passwd, course)
 
 
 @app.route('/user', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
-def user_page():
+def user_route():
     """
-    個人資料畫面
+    個資畫面
     """
     # 取得使用者物件
     useruid = current_user.get_id()
@@ -76,29 +76,10 @@ def user_page():
 
     if request.method == 'GET':
         # 取得要查看的使用者 ID
-        try:
-            view_userid = request.args['userid']
-        except KeyError:
-            view_userid = userid
-        # 取得要查看的使用者 Email
-        try:
-            view_email = User(view_userid + user.course).email
-        except KeyError:
-            if view_userid == userid:
-                # 如果查看是自己的話就顯示自己的 Email
-                view_email = user.email
-            else:
-                view_email = ''
+        target_id = request.args.get('userid')
 
-        return render_template(
-            'user.j2',
-            title=("KCOJ - " + view_userid),
-            userid=userid,
-            profile_image=Gravatar(user.email).set_size(30).image,
-            view_userid=view_userid,
-            view_email=view_email,
-            view_gravatar=Gravatar(view_email).set_size(200).image,
-            no_me=(userid != view_userid))
+        # 顯示個資畫面
+        return user_page(useruid, target_id)
 
     if request.method == 'POST':
         # 取得要更新的資訊
