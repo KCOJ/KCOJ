@@ -8,6 +8,7 @@ from ..utils.sessions import get_session
 from ..utils.gravatar import Gravatar
 from ..models.user import User
 from ..controllers.keep_active import keep_active
+from ..controllers.index_page import main as index_main
 from ..question import QUESTIONS
 from ..config import CONFIG
 
@@ -21,24 +22,17 @@ ext_questions = QUESTIONS
 @login_required
 def index_page():
     """
-    主畫面
+    首頁畫面
     """
     # 取得使用者物件
     useruid = current_user.get_id()
-    user = User(useruid)
-    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
         logout_user()
 
     # 顯示主畫面
-    return render_template(
-        'index.j2',
-        title="KCOJ - 首頁",
-        userid=user.userid,
-        profile_image=Gravatar(user.email).set_size(30).image,
-        notices=session.get_notices())
+    return index_main(useruid)
 
 
 @app.route('/login', methods=['GET', 'POST'], strict_slashes=False)
