@@ -33,11 +33,6 @@
                         {% endfor %}
                     </select>
                 </div>
-                {% if error_message %}		
-                <div class="input-group mb-3 alert alert-danger message">		
-                    {{ error_message }}		
-                </div>		
-                {% endif %}
                 <div class="input-group d-flex justify-content-center">
                         <button type="submit" class="btn btn-primary">登入</button>
                 </div>
@@ -45,5 +40,11 @@
             <p class='mt-note text-center color-deep-gray'>&copy; Kuo Cool Online Judge 2018-2019</p>
         </div>
     </section>
+
+    <script>
+        {% if error_message %}		
+            alert("{{ error_message }}")
+        {% endif %}
+    </script>
 </body>
 </html>
