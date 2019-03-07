@@ -14,13 +14,9 @@ from ..controllers.login import main as login
 from ..controllers.user_page import main as user_page
 from ..controllers.user import main as user
 from ..controllers.question_page import main as question_page
-from ..question import QUESTIONS
 from ..config import CONFIG
 
 app = Blueprint('pages', __name__)
-
-# 由外部提供題目標題、敘述、標籤
-ext_questions = QUESTIONS
 
 
 @app.route('/', methods=['GET'], strict_slashes=False)
@@ -140,15 +136,6 @@ def question_number_page(number):
                 'results': session.list_results(num, userid),
             }
 
-        # 取得外部提供的題目資訊
-        for num in ext_questions:
-            # 如果 API 沒有這題就跳過
-            if not num in api_question:
-                continue
-            questions[num]['title'] = ext_questions[num]['title']
-            questions[num]['description'] = ext_questions[num]['description']
-            questions[num]['tag'] = ext_questions[num]['tag']
-
         # 選擇特定的題目
         question = questions[number]
 
@@ -248,15 +235,6 @@ def question_number_forum_page(number):
                 'results': session.list_results(num, userid),
             }
 
-        # 取得外部提供的題目資訊
-        for num in ext_questions:
-            # 如果 API 沒有這題就跳過
-            if not num in api_question:
-                continue
-            questions[num]['title'] = ext_questions[num]['title']
-            questions[num]['description'] = ext_questions[num]['description']
-            questions[num]['tag'] = ext_questions[num]['tag']
-
         # 選擇特定的題目
         question = questions[number]
 
@@ -326,15 +304,6 @@ def question_number_passed_page(number):
             'language': api_question[num]['language'],
             'results': session.list_results(num, userid),
         }
-
-    # 取得外部提供的題目資訊
-    for num in ext_questions:
-        # 如果 API 沒有這題就跳過
-        if not num in api_question:
-            continue
-        questions[num]['title'] = ext_questions[num]['title']
-        questions[num]['description'] = ext_questions[num]['description']
-        questions[num]['tag'] = ext_questions[num]['tag']
 
     # 選擇特定的題目
     question = questions[number]
