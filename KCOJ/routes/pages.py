@@ -8,8 +8,8 @@ from ..utils.sessions import get_session
 from ..utils.gravatar import Gravatar
 from ..models.user import User
 from ..controllers.keep_active import keep_active
-from ..controllers.index_page import main as index_main
-from ..controllers.login_page import main as login_main
+from ..controllers.index_page import main as index_page
+from ..controllers.login_page import main as login_page
 from ..question import QUESTIONS
 from ..config import CONFIG
 
@@ -21,7 +21,7 @@ ext_questions = QUESTIONS
 
 @app.route('/', methods=['GET'], strict_slashes=False)
 @login_required
-def index_page():
+def index_route():
     """
     首頁畫面
     """
@@ -33,11 +33,11 @@ def index_page():
         logout_user()
 
     # 顯示主畫面
-    return index_main(useruid)
+    return index_page(useruid)
 
 
 @app.route('/login', methods=['GET', 'POST'], strict_slashes=False)
-def login_page():
+def login_route():
     """
     登入畫面
     """
@@ -46,7 +46,7 @@ def login_page():
 
     if request.method == 'GET':
         # 顯示登入畫面
-        return login_main()
+        return login_page()
 
     if request.method == 'POST':
         # 取得登入資訊
