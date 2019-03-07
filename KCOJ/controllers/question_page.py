@@ -17,7 +17,7 @@ def main(useruid: str):
     for number, question in session.get_question().items():
         question['title'] = "未命名"
         question['description'] = "沒有敘述"
-        question['tag'] = ""
+        question['tag'] = []
         question['results'] = session.list_results(number, user.userid)
 
         if len(question['results']) == 0:
