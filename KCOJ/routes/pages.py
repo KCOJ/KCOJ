@@ -9,6 +9,7 @@ from ..utils.gravatar import Gravatar
 from ..models.user import User
 from ..controllers.keep_active import keep_active
 from ..controllers.index_page import main as index_main
+from ..controllers.login_page import main as login_main
 from ..question import QUESTIONS
 from ..config import CONFIG
 
@@ -45,10 +46,7 @@ def login_page():
 
     if request.method == 'GET':
         # 顯示登入畫面
-        return render_template(
-            'login.j2',
-            title="KCOJ - 登入",
-            courses=session.courses)
+        return login_main()
 
     if request.method == 'POST':
         # 取得登入資訊
