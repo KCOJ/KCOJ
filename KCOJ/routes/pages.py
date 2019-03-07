@@ -13,6 +13,7 @@ from ..controllers.login_page import main as login_page
 from ..controllers.login import main as login
 from ..controllers.user_page import main as user_page
 from ..controllers.user import main as user
+from ..controllers.question_page import main as question_page
 from ..question import QUESTIONS
 from ..config import CONFIG
 
@@ -88,87 +89,18 @@ def user_route():
 
 @app.route('/question', methods=['GET'], strict_slashes=False)
 @login_required
-def question_page():
+def question_route():
     """
-    作業題庫畫面
+    題庫畫面
     """
     # 取得使用者物件
     useruid = current_user.get_id()
-    user = User(useruid)
-    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
         logout_user()
 
-    # 取得使用者 ID
-    userid = user.userid
-
-    # 所有題目列表
-    questions = {}
-
-    # 取得 API 裡的題目資訊
-    api_question = session.get_question()
-    for num in api_question:
-        questions[num] = {
-            'title': '未命名',
-            'description': '沒有敘述',
-            'tag': '',
-            'deadline': api_question[num]['deadline'],
-            'submit': '期限已到' if api_question[num]['expired'] else '期限未到',
-            'status': '已繳' if api_question[num]['status'] else '未繳',
-            'language': api_question[num]['language'],
-            'results': session.list_results(num, userid),
-        }
-
-    # 取得外部提供的題目資訊
-    for num in ext_questions:
-        # 如果 API 沒有這題就跳過
-        if not num in api_question:
-            continue
-        # 新增外部資訊
-        questions[num]['title'] = ext_questions[num]['title']
-        questions[num]['description'] = ext_questions[num]['description']
-        questions[num]['tag'] = ext_questions[num]['tag']
-
-    closed = {}
-    opened = {}
-
-    for num in questions:
-        # 判斷題目是否關閉
-        if questions[num]['submit'] == '期限已到':
-            # 收錄至已關閉的題目
-            closed[num] = questions[num]
-            if len(closed[num]['results']) == 0:
-                # 題目燈號為未繳交
-                closed[num]['light'] = 2
-            else:
-                results = []
-                for result in closed[num]['results']:
-                    results += [result[1] == '通過測試']
-                # 題目燈號為已／未繳交
-                closed[num]['light'] = 0 if False in results else 1
-        else:
-            # 收錄至仍開啟的題目
-            opened[num] = questions[num]
-            if len(opened[num]['results']) == 0:
-                # 題目燈號為未繳交
-                opened[num]['light'] = 2
-            else:
-                results = []
-                for result in opened[num]['results']:
-                    results += [result[1] == '通過測試']
-                # 題目燈號為已／未繳交
-                opened[num]['light'] = 0 if False in results else 1
-
-    return render_template(
-        'question.j2',
-        title="KCOJ - " + user.course + " 題庫",
-        userid=userid,
-        profile_image=Gravatar(user.email).set_size(30).image,
-        course=user.course,
-        opened_questions=opened,
-        closed_questions=closed)
+    return question_page(useruid)
 
 
 @app.route('/question/<number>/content', methods=['GET', 'POST'], strict_slashes=False)
