@@ -12,6 +12,7 @@ from ..controllers.index_page import main as index_page
 from ..controllers.login_page import main as login_page
 from ..controllers.login import main as login
 from ..controllers.user_page import main as user_page
+from ..controllers.user import main as user
 from ..question import QUESTIONS
 from ..config import CONFIG
 
@@ -64,15 +65,10 @@ def user_route():
     """
     # 取得使用者物件
     useruid = current_user.get_id()
-    user = User(useruid)
-    session = get_session(useruid)
 
     # 嘗試保持登入狀態
     if not keep_active(useruid):
         logout_user()
-
-    # 取得使用者 ID
-    userid = user.userid
 
     if request.method == 'GET':
         # 取得要查看的使用者 ID
@@ -83,24 +79,11 @@ def user_route():
 
     if request.method == 'POST':
         # 取得要更新的資訊
-        old_passwd = request.form['old_passwd']
-        new_passwd = request.form['new_passwd']
-        email = request.form['email']
-        # 登入交作業網站
-        api = KCOJ(CONFIG['TARGET']['URL'])
-        api.login(userid, old_passwd,
-                  api.courses.index(user.course) + 1)
-        # 確認是否登入成功
-        if api.active:
-            # 如果要變更密碼
-            if new_passwd != '':
-                api.update_password(new_passwd)
-                user.passwd = new_passwd
-            # 如果要變更 Email
-            if email != '':
-                user.email = email
+        old_passwd = request.form.get('old_passwd')
+        new_passwd = request.form.get('new_passwd')
+        email = request.form.get('email')
 
-        return redirect('/user')
+        return user(useruid, old_passwd, new_passwd, email)
 
 
 @app.route('/question', methods=['GET'], strict_slashes=False)
