@@ -50,5 +50,11 @@
             </div>
         </form>
     </div>
+
+    <script>
+        {% if alert %}		
+            alert("{{ alert }}")
+        {% endif %}
+    </script>
 </main>
 {% endblock %}

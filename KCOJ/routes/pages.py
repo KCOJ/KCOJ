@@ -15,6 +15,7 @@ from ..controllers.user_page import main as user_page
 from ..controllers.user import main as user
 from ..controllers.question_page import main as question_page
 from ..controllers.question_content_page import main as question_content_page
+from ..controllers.question_content import main as question_content
 from ..config import CONFIG
 
 app = Blueprint('pages', __name__)
@@ -118,39 +119,10 @@ def question_content_route(number):
         return question_content_page(useruid, number)
 
     if request.method == 'POST':
-        user = User(useruid)
-        session = get_session(useruid)
-
         # 取得使用者程式碼
         code = request.form['code']
-        # 定義檔名
-        filename = user.userid + number
-        language = session.get_question()[number]['language']
-        if language == 'Python':
-            filename += '.py'
-        if language == 'Java':
-            filename += '.java'
-        if language == 'C#':
-            filename += '.cs'
-        if language == 'C':
-            filename += '.c'
-        # 把程式碼儲存成文字檔
-        with open(sys.path[0] + '/' + filename, 'w') as f:
-            f.write(code)
-        # 刪除原本的程式碼
-        session.delete_question_answer(number)
-        # 上傳並判斷是否成功
-        if session.post_question_answer(number, "Send from KCOJ", filename):
-            # TODO: 提示上傳成功
-            pass
-        else:
-            # TODO: 提示上傳失敗
-            pass
 
-        # 移除上傳的檔案
-        os.remove(filename)
-        # 回到題目頁
-        return redirect('/question/' + number)
+        return question_content(useruid, number, code)
 
 
 @app.route('/question/<number>/passed', methods=['GET'], strict_slashes=False)

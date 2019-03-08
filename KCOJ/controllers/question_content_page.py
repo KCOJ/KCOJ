@@ -4,7 +4,7 @@ from ..utils.sessions import get_session
 from ..utils.gravatar import Gravatar
 
 
-def main(useruid: str, number: str):
+def main(useruid: str, number: str, alert: str=''):
     """
     題目內容畫面
     """
@@ -45,4 +45,5 @@ def main(useruid: str, number: str):
         question_title=question['title'],
         question_content=content,
         question_cases=test_cases,
-        question_light=question['light'])
+        question_light=question['light'],
+        alert=alert)
