@@ -1,5 +1,4 @@
-from flask import redirect, render_template
-from flask_login import login_user
+from flask import redirect
 from ..models.user import User
 from ..utils.sessions import get_session, get_empty_session
 
