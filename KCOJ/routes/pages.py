@@ -1,12 +1,6 @@
-import os
-import sys
-from flask import Blueprint, request, redirect, render_template
-from flask_login import login_required, login_user, logout_user, current_user
-from KCOJ_api import KCOJ
+from flask import Blueprint, request, redirect
+from flask_login import login_required, logout_user, current_user
 
-from ..utils.sessions import get_session
-from ..utils.gravatar import Gravatar
-from ..models.user import User
 from ..controllers.keep_active import keep_active
 from ..controllers.index_page import main as index_page
 from ..controllers.login_page import main as login_page
@@ -17,7 +11,6 @@ from ..controllers.question_page import main as question_page
 from ..controllers.question_content_page import main as question_content_page
 from ..controllers.question_content import main as question_content
 from ..controllers.question_passed_page import main as question_passed_page
-from ..config import CONFIG
 
 app = Blueprint('pages', __name__)
 
