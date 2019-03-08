@@ -21,7 +21,6 @@ def main(userid: str, passwd: str, course: str):
         user.userid = userid
         user.passwd = passwd
         user.course = course
-        user.email = ''
 
         return redirect('/')
 
