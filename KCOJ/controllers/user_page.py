@@ -13,6 +13,8 @@ def main(useruid: str, targe_id: str):
         targe_id = user.userid
 
     target = User(targe_id + user.course)
+    if not target.userid:
+        target.userid = targe_id
 
     return render_template(
         'user.j2',
