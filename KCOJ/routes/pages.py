@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect
+from flask import Blueprint, request
 from flask_login import login_required, logout_user, current_user
 
 from ..controllers.keep_active import keep_active
@@ -11,6 +11,7 @@ from ..controllers.question_page import main as question_page
 from ..controllers.question_content_page import main as question_content_page
 from ..controllers.question_content import main as question_content
 from ..controllers.question_passed_page import main as question_passed_page
+from ..controllers.logout import main as logout
 
 app = Blueprint('pages', __name__)
 
@@ -137,9 +138,10 @@ def question_passed_route(number):
 
 @app.route('/logout', methods=['GET'], strict_slashes=False)
 @login_required
-def logout_nopage():
+def logout_route():
     """
     登出系統
     """
     logout_user()
-    return redirect('/login')
+
+    return logout()
