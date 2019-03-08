@@ -14,8 +14,10 @@ def main(useruid: str, number: str):
     question = session.get_question()[number]
 
     question['title'] = "未命名"
-    question['description'] = question['deadline']  # TODO: Correct name in template
-    question['tag'] = [question['language']]        # TODO: Correct name in template
+    # TODO: Correct name in template
+    question['description'] = question['deadline']
+    # TODO: Correct name in template
+    question['tag'] = [question['language']]
     question['results'] = session.list_results(number, user.userid)
 
     if len(question['results']) == 0:
