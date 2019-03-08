@@ -14,10 +14,10 @@
     {% for notice in notices %}   
     <div class="card my-3">
         <h3 class="card-header text-center">
-            {{  notice[1]  }}
+            {{  notice[1]|e  }}
         </h3>
         <div class="card-body">
-            <pre>{{  notice[2]  }}</pre>
+            <pre>{{  notice[2]|e  }}</pre>
             <p class="card-text"><small class="text-muted">{{  notice[0]  }}</small></p>
         </div>
     </div>
