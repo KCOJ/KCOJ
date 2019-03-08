@@ -6,7 +6,7 @@ from ..utils.sessions import get_empty_session
 
 def main(userid: str, passwd: str, course: str):
     """
-    登入畫面
+    登入系統
     """
     session = get_empty_session()
 

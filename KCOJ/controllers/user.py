@@ -6,7 +6,7 @@ from ..utils.sessions import get_session, get_empty_session
 
 def main(useruid: str, old_passwd: str, new_passwd: str, email: str):
     """
-    登入畫面
+    修改個資
     """
     user = User(useruid)
     session = get_empty_session()
