@@ -3,7 +3,10 @@ import hashlib
 
 class Gravatar:
     def __init__(self, email: str):
-        self.__email = email
+        if email:
+            self.__email = email
+        else:
+            self.__email = "example@example.com"
         self.__size = 30
 
     def set_size(self, size: int):
